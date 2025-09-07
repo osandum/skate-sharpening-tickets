@@ -1,10 +1,10 @@
 # Flask Skate Sharpening Ticket System
 # Complete backend with database, auth, SMS, and payment integration
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory, g
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, g
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import string
 import requests
