@@ -1,0 +1,158 @@
+<!-- templates/sharpener_dashboard.html -->
+{% extends "base.html" %}
+{% block title %}Sharpener Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">
+            ✂️ Sharpener Dashboard
+        </h1>
+        <div class="flex items-center space-x-4">
+            <span class="text-gray-600">Welcome, {{ session.sharpener_name }}</span>
+            <a href="{{ url_for('sharpener_logout') }}" class="text-red-600 hover:text-red-800">Logout</a>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-yellow-800">{{ unpaid_count }}</div>
+            <div class="text-yellow-600">Unpaid Tickets</div>
+        </div>
+
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-blue-800">{{ ready_tickets|length }}</div>
+            <div class="text-blue-600">Ready to Sharpen</div>
+        </div>
+
+        <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-orange-800">{{ in_progress_tickets|length }}</div>
+            <div class="text-orange-600">In Progress</div>
+        </div>
+
+        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-green-800">{{ completed_today }}</div>
+            <div class="text-green-600">Completed Today</div>
+        </div>
+    </div>
+
+    <!-- Personal Stats -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">📊 Your Performance</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600">{{ avg_rating }}/5</div>
+                <div class="text-sm text-gray-600">Average Rating</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-indigo-600">{{ feedback_count }}</div>
+                <div class="text-sm text-gray-600">Total Feedback</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-pink-600">{{ my_recent_tickets|length }}</div>
+                <div class="text-sm text-gray-600">Recent Jobs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Queue -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center">
+            🎯 Ready to Sharpen ({{ ready_tickets|length }})
+        </h2>
+
+        {% if ready_tickets %}
+            <div class="space-y-3">
+                {% for ticket in ready_tickets %}
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-mono text-xl font-bold text-blue-800">{{ ticket.code }}</div>
+                                <div class="text-sm text-gray-700">{{ ticket.customer_name }} • {{ ticket.customer_phone }}</div>
+                                <div class="text-sm text-gray-600">
+                                    Skates: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    Paid: {{ ticket.paid_at.strftime('%H:%M') if ticket.paid_at else 'Unknown' }}
+                                </div>
+                            </div>
+                            <a href="{{ url_for('claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                Claim & Start
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8 text-gray-500">
+                No paid tickets waiting for sharpening
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- In Progress -->
+    {% if in_progress_tickets %}
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">⚡ Your In-Progress Jobs</h2>
+            <div class="space-y-3">
+                {% for ticket in in_progress_tickets %}
+                    {% if ticket.sharpened_by_id == session.sharpener_id %}
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-mono text-xl font-bold text-orange-800">{{ ticket.code }}</div>
+                                    <div class="text-sm text-gray-700">{{ ticket.customer_name }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        Skates: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        Started: {{ ticket.started_at.strftime('%H:%M') if ticket.started_at else 'Unknown' }}
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                    Mark Complete
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recent Feedback -->
+    {% if my_recent_tickets %}
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">💬 Your Recent Work & Feedback</h2>
+            <div class="space-y-3">
+                {% for ticket in my_recent_tickets %}
+                    <div class="bg-gray-50 border rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-mono text-lg font-bold">{{ ticket.code }}</div>
+                                <div class="text-sm text-gray-600">{{ ticket.customer_name }} • {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
+                                <div class="text-xs text-gray-500">Completed: {{ ticket.completed_at.strftime('%d/%m %H:%M') if ticket.completed_at else 'Unknown' }}</div>
+                            </div>
+                            <div class="text-right">
+                                {% if ticket.feedback %}
+                                    <div class="text-lg">
+                                        {% for i in range(ticket.feedback.rating) %}⭐{% endfor %}
+                                    </div>
+                                    {% if ticket.feedback.comment %}
+                                        <div class="text-sm text-gray-600 italic max-w-xs">
+                                            "{{ ticket.feedback.comment[:50] }}{% if ticket.feedback.comment|length > 50 %}...{% endif %}"
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="text-sm text-gray-400">No feedback yet</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
