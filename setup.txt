@@ -1,0 +1,180 @@
+# Skate Sharpening System Setup Instructions
+
+## Requirements (requirements.txt)
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Werkzeug==2.3.7
+requests==2.31.0
+
+## Setup Instructions
+
+### 1. Create project directory and virtual environment
+mkdir skate-sharpening
+cd skate-sharpening
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+### 2. Install dependencies
+pip install -r requirements.txt
+
+### 3. Create directory structure
+mkdir templates static
+# Copy the Flask app code to app.py
+# Copy all HTML templates to templates/ directory
+
+### 4. Environment Variables (create .env file)
+# For production, set these environment variables:
+export GATEWAYAPI_TOKEN="your-actual-gatewayapi-token"
+export STRIPE_SECRET_KEY="sk_test_your-stripe-secret-key"
+export STRIPE_PUBLISHABLE_KEY="pk_test_your-stripe-publishable-key"
+export BASE_URL="https://yourdomain.com"  # For SMS links
+export SECRET_KEY="your-very-secret-key-change-this"
+
+### 5. Initialize database and create first sharpener
+python -c "
+from app import app, db
+with app.app_context():
+    db.create_all()
+    print('Database created!')
+"
+
+### 6. Run the application
+flask run
+# Or: python app.py
+
+## First Time Setup
+
+### 1. Create sharpener accounts
+# Visit http://localhost:5000/admin/create_sharpener
+# Create accounts for your volunteer sharpeners
+
+### 2. Test the flow
+# Visit http://localhost:5000 to test customer ticket creation
+# Visit http://localhost:5000/sharpener to test sharpener login
+
+## Production Deployment (suggestions)
+
+### Option 1: DigitalOcean App Platform
+# - Create new app from GitHub repo
+# - Set environment variables in dashboard
+# - Automatically handles HTTPS and scaling
+# - Costs ~$5-12/month
+
+### Option 2: Railway
+# - Connect GitHub repo
+# - Set environment variables
+# - Automatic deployments
+# - Generous free tier
+
+### Option 3: Traditional VPS
+# - Use nginx + gunicorn
+# - Set up SSL certificate
+# - More control, more setup required
+
+## API Integration Setup
+
+### GatewayAPI (SMS)
+# 1. Sign up at gatwayapi.eu
+# 2. Get API token from dashboard
+# 3. Test with a few SMS to verify Danish mobile numbers work
+# 4. Set credit limit appropriate for your usage
+
+### Stripe (MobilePay)
+# 1. Create Stripe account
+# 2. Enable MobilePay payment method in dashboard
+# 3. Get test keys for development
+# 4. Implement webhooks for payment confirmation (production)
+# 5. Get live keys for production
+
+## Database Migration (when needed)
+# SQLite is fine for small clubs (< 1000 tickets/month)
+# For larger usage, migrate to PostgreSQL:
+
+### PostgreSQL setup
+# Install PostgreSQL
+# Create database: createdb skate_sharpening
+# Update database URL in app.py:
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:pass@localhost/skate_sharpening'
+
+## Monitoring & Maintenance
+
+### Log Files
+# Check Flask logs for errors
+# Monitor SMS delivery rates
+# Track payment success rates
+
+### Backup
+# SQLite: Copy skate_tickets.db file regularly
+# PostgreSQL: Use pg_dump for backups
+
+### Updates
+# Git pull latest changes
+# pip install -r requirements.txt --upgrade
+# Test in development first
+
+## Security Considerations
+
+### Production Changes Needed:
+1. Change SECRET_KEY to a random 32+ character string
+2. Set Flask debug=False
+3. Use HTTPS (handled by deployment platforms)
+4. Regularly update dependencies
+5. Monitor for failed login attempts
+6. Consider rate limiting for ticket creation
+
+### User Data:
+- Phone numbers are stored (required for SMS)
+- No sensitive payment data stored (handled by Stripe)
+- Consider GDPR compliance if needed
+
+## Troubleshooting
+
+### Common Issues:
+1. SMS not sending: Check GatewayAPI credentials and phone number format
+2. Payments failing: Verify Stripe configuration and webhook setup
+3. Database errors: Check file permissions for SQLite
+4. Template errors: Ensure all HTML files are in templates/ directory
+
+### Debug Mode:
+# Add these lines to app.py for detailed error messages:
+app.config['DEBUG'] = True
+app.config['SQLALCHEMY_ECHO'] = True  # Shows database queries
+
+## Customization Ideas
+
+### Additional Features You Could Add:
+1. Email notifications as backup to SMS
+2. Bulk operations for sharpeners (claim multiple tickets)
+3. Different pricing for different skate types
+4. Appointment scheduling for popular times
+5. Integration with club membership system
+6. Monthly reports and analytics
+7. Mobile app using Flask as API backend
+
+### Club-Specific Customizations:
+- Add club logo to templates
+- Customize colors/branding in CSS
+- Add club-specific skate brands
+- Adjust pricing structure
+- Add special instructions or rules
+
+## File Structure Summary:
+skate-sharpening/
+├── app.py                 # Main Flask application
+├── requirements.txt       # Python dependencies
+├── skate_tickets.db      # SQLite database (created automatically)
+├── templates/            # HTML templates
+│   ├── base.html
+│   ├── customer.html
+│   ├── sharpener_login.html
+│   ├── sharpener_dashboard.html
+│   ├── payment.html
+│   ├── feedback_form.html
+│   └── create_sharpener.html
+└── static/              # CSS, JS, images (if needed)
+
+## Support
+# For Flask issues: https://flask.palletsprojects.com/
+# For SQLAlchemy: https://docs.sqlalchemy.org/
+# For GatewayAPI: https://gatwayapi.eu/docs/
+# For Stripe: https://stripe.com/docs/

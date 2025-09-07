@@ -1,0 +1,55 @@
+<!-- templates/payment.html -->
+{% extends "base.html" %}
+{% block title %}Pay for Ticket {{ ticket.code }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">
+            💳 Pay for Sharpening
+        </h1>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-blue-800 mb-2">Ticket Details:</h3>
+            <div class="text-sm space-y-1">
+                <div><strong>Code:</strong> {{ ticket.code }}</div>
+                <div><strong>Customer:</strong> {{ ticket.customer_name }}</div>
+                <div><strong>Skates:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
+                <div><strong>Amount:</strong> 25 DKK</div>
+            </div>
+        </div>
+
+        <div class="text-center mb-6">
+            <div class="text-4xl mb-2">⛸️</div>
+            <p class="text-gray-600 text-sm">
+                Click below to pay with MobilePay through Stripe
+            </p>
+        </div>
+
+        <!-- In real implementation, integrate Stripe Elements here -->
+        <div class="space-y-4">
+            <button onclick="simulatePayment()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
+                📱 Pay with MobilePay (25 DKK)
+            </button>
+
+            <div class="text-center">
+                <a href="{{ url_for('payment_success', ticket_code=ticket.code) }}" class="text-sm text-blue-600 hover:text-blue-800">
+                    [Demo: Skip to payment success]
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-6 text-xs text-gray-500 text-center">
+            <p>⚠️ Your skates will only be sharpened after payment</p>
+            <p>💡 Parents can use this same link to pay</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function simulatePayment() {
+    alert('In real implementation: Stripe MobilePay flow would happen here');
+    window.location.href = "{{ url_for('payment_success', ticket_code=ticket.code) }}";
+}
+</script>
+{% endblock %}
