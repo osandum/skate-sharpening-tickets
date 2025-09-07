@@ -1,16 +1,16 @@
 <!-- templates/sharpener_dashboard.html -->
 {% extends "base.html" %}
-{% block title %}Sharpener Dashboard{% endblock %}
+{% block title %}{{ t('sharpener_dashboard') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">
-            ✂️ Sharpener Dashboard
+            ✂️ {{ t('sharpener_dashboard') }}
         </h1>
         <div class="flex items-center space-x-4">
             <span class="text-gray-600">Welcome, {{ session.sharpener_name }}</span>
-            <a href="{{ url_for('sharpener_logout') }}" class="text-red-600 hover:text-red-800">Logout</a>
+            <a href="{{ url_for('sharpener_logout') }}" class="text-red-600 hover:text-red-800">{{ t('logout') }}</a>
         </div>
     </div>
 
@@ -18,40 +18,40 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 text-center">
             <div class="text-3xl font-bold text-yellow-800">{{ unpaid_count }}</div>
-            <div class="text-yellow-600">Unpaid Tickets</div>
+            <div class="text-yellow-600">{{ t('tickets_awaiting_payment') }}</div>
         </div>
 
         <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center">
             <div class="text-3xl font-bold text-blue-800">{{ ready_tickets|length }}</div>
-            <div class="text-blue-600">Ready to Sharpen</div>
+            <div class="text-blue-600">{{ t('ready_for_sharpening') }}</div>
         </div>
 
         <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 text-center">
             <div class="text-3xl font-bold text-orange-800">{{ in_progress_tickets|length }}</div>
-            <div class="text-orange-600">In Progress</div>
+            <div class="text-orange-600">{{ t('in_progress') }}</div>
         </div>
 
         <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
             <div class="text-3xl font-bold text-green-800">{{ completed_today }}</div>
-            <div class="text-green-600">Completed Today</div>
+            <div class="text-green-600">{{ t('completed_today') }}</div>
         </div>
     </div>
 
     <!-- Personal Stats -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">📊 Your Performance</h2>
+        <h2 class="text-xl font-semibold mb-4">📊 {{ t('my_performance') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="text-center">
                 <div class="text-2xl font-bold text-purple-600">{{ avg_rating }}/5</div>
-                <div class="text-sm text-gray-600">Average Rating</div>
+                <div class="text-sm text-gray-600">{{ t('average_rating') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-indigo-600">{{ feedback_count }}</div>
-                <div class="text-sm text-gray-600">Total Feedback</div>
+                <div class="text-sm text-gray-600">{{ t('total_feedback') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-pink-600">{{ my_recent_tickets|length }}</div>
-                <div class="text-sm text-gray-600">Recent Jobs</div>
+                <div class="text-sm text-gray-600">{{ t('recent_work') }}</div>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
     <!-- Work Queue -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4 flex items-center">
-            🎯 Ready to Sharpen ({{ ready_tickets|length }})
+            🎯 {{ t('ready_for_sharpening') }} ({{ ready_tickets|length }})
         </h2>
 
         {% if ready_tickets %}
@@ -71,14 +71,14 @@
                                 <div class="font-mono text-xl font-bold text-blue-800">{{ ticket.code }}</div>
                                 <div class="text-sm text-gray-700">{{ ticket.customer_name }} • {{ ticket.customer_phone }}</div>
                                 <div class="text-sm text-gray-600">
-                                    Skates: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
+                                    {{ t('skates') }}: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
                                 </div>
                                 <div class="text-xs text-gray-500">
                                     Paid: {{ ticket.paid_at.strftime('%H:%M') if ticket.paid_at else 'Unknown' }}
                                 </div>
                             </div>
                             <a href="{{ url_for('claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
-                                Claim & Start
+                                {{ t('claim_ticket') }}
                             </a>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
             </div>
         {% else %}
             <div class="text-center py-8 text-gray-500">
-                No paid tickets waiting for sharpening
+                {{ t('ready_for_sharpening') }}
             </div>
         {% endif %}
     </div>
@@ -94,7 +94,7 @@
     <!-- In Progress -->
     {% if in_progress_tickets %}
         <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">⚡ Your In-Progress Jobs</h2>
+            <h2 class="text-xl font-semibold mb-4">⚡ {{ t('in_progress_tickets') }}</h2>
             <div class="space-y-3">
                 {% for ticket in in_progress_tickets %}
                     {% if ticket.sharpened_by_id == session.sharpener_id %}
@@ -104,14 +104,14 @@
                                     <div class="font-mono text-xl font-bold text-orange-800">{{ ticket.code }}</div>
                                     <div class="text-sm text-gray-700">{{ ticket.customer_name }}</div>
                                     <div class="text-sm text-gray-600">
-                                        Skates: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
+                                        {{ t('skates') }}: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
                                     </div>
                                     <div class="text-xs text-gray-500">
                                         Started: {{ ticket.started_at.strftime('%H:%M') if ticket.started_at else 'Unknown' }}
                                     </div>
                                 </div>
                                 <a href="{{ url_for('complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
-                                    Mark Complete
+                                    {{ t('complete_ticket') }}
                                 </a>
                             </div>
                         </div>
@@ -124,7 +124,7 @@
     <!-- Recent Feedback -->
     {% if my_recent_tickets %}
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">💬 Your Recent Work & Feedback</h2>
+            <h2 class="text-xl font-semibold mb-4">💬 {{ t('recent_work') }} & {{ t('feedback') }}</h2>
             <div class="space-y-3">
                 {% for ticket in my_recent_tickets %}
                     <div class="bg-gray-50 border rounded-lg p-4">

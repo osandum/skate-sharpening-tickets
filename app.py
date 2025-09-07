@@ -70,6 +70,271 @@ class Feedback(db.Model):
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Internationalization
+TRANSLATIONS = {
+    'da': {
+        # General
+        'skate_sharpening': 'Skøjteslibning',
+        'customer_form': 'Kundeformular',
+        'sharpener_dashboard': 'Sliber Dashboard',
+        'login': 'Log ind',
+        'logout': 'Log ud',
+        'name': 'Navn',
+        'phone': 'Telefon',
+        'username': 'Brugernavn',
+        'password': 'Adgangskode',
+        
+        # Customer form
+        'request_sharpening': 'Anmod om skøjteslibning',
+        'your_name': 'Dit navn',
+        'your_phone': 'Dit telefonnummer',
+        'skate_brand': 'Skøjtemærke',
+        'skate_color': 'Farve',
+        'skate_size': 'Størrelse',
+        'submit_request': 'Send anmodning',
+        'select_brand': 'Vælg mærke',
+        'select_color': 'Vælg farve',
+        'select_size': 'Vælg størrelse',
+        
+        # Ticket status
+        'unpaid': 'Ubetalt',
+        'paid': 'Betalt',
+        'in_progress': 'Under bearbejdning',
+        'completed': 'Færdig',
+        
+        # Dashboard
+        'tickets_awaiting_payment': 'Billetter venter på betaling',
+        'ready_for_sharpening': 'Klar til slibning',
+        'in_progress_tickets': 'Billetter under bearbejdning',
+        'completed_today': 'Færdiggjort i dag',
+        'claim_ticket': 'Påtag billet',
+        'complete_ticket': 'Fuldfør billet',
+        'ticket_code': 'Billetkode',
+        'customer': 'Kunde',
+        'skates': 'Skøjter',
+        'created': 'Oprettet',
+        'my_performance': 'Min præstation',
+        'average_rating': 'Gennemsnitlig bedømmelse',
+        'total_feedback': 'Total feedback',
+        'recent_work': 'Seneste arbejde',
+        
+        # Payment
+        'payment': 'Betaling',
+        'pay_for_sharpening': 'Betal for slibning',
+        'amount': 'Beløb',
+        'pay_now': 'Betal nu',
+        'payment_success': 'Betaling gennemført',
+        'payment_received': 'Betaling modtaget!',
+        'already_paid': 'Allerede betalt',
+        
+        # Feedback
+        'feedback': 'Feedback',
+        'rate_service': 'Bedøm servicen',
+        'rating': 'Bedømmelse',
+        'comment': 'Kommentar',
+        'submit_feedback': 'Send feedback',
+        'thank_you': 'Tak for din feedback!',
+        'stars': 'stjerner',
+        
+        # Messages
+        'ticket_request_sent': 'Billetanmodning sendt! Tjek din telefon for billetkode og betalingslink.',
+        'name_phone_required': 'Navn og telefonnummer er påkrævet!',
+        'invalid_login': 'Ugyldig brugernavn eller adgangskode',
+        'ticket_claimed': 'Påtaget billet {}',
+        'ticket_completed': 'Færdiggjort billet {}. Kunde underrettet!',
+        'cannot_complete': 'Kan ikke fuldføre denne billet',
+        'ticket_not_available': 'Billet er ikke tilgængelig til slibning',
+        'username_exists': 'Brugernavn findes allerede',
+        'sharpener_created': 'Sliber {} oprettet med succes!',
+        
+        # Admin
+        'create_sharpener': 'Opret sliber',
+        'existing_sharpeners': 'Eksisterende slibere',
+        'create_account': 'Opret konto',
+        
+        # SMS Messages
+        'sms_ticket_created': """Din skøjtebillet: {}
+
+1. Skriv "{}" på papir med dine skøjter
+2. Læg skøjter på "til slibning" hylde
+3. BETAL FØR SLIBNING STARTER: {}
+
+💡 Send dette betalingslink til dine forældre!
+⚠️ Ingen betaling = ingen slibning
+
+Dine skøjter: {}""",
+        
+        'sms_payment_received': """Betaling modtaget! ✅
+
+Billet {} er nu i slibningskøen.
+Du får en SMS når dine skøjter er klar.
+
+Skøjter: {} {} {}""",
+        
+        'sms_skates_ready': """Dine skøjter er klar til afhentning! 🥅
+
+Billet: {}
+Slebet af: {}
+Skøjter: {} {} {}
+
+Hvordan gik det? Giv feedback: {}""",
+        
+        'sms_feedback_received': """Ny feedback modtaget! {}
+
+Fra: {}
+Billet: {}
+Bedømmelse: {}/5 stjerner"""
+    },
+    'en': {
+        # General
+        'skate_sharpening': 'Skate Sharpening',
+        'customer_form': 'Customer Form',
+        'sharpener_dashboard': 'Sharpener Dashboard',
+        'login': 'Login',
+        'logout': 'Logout',
+        'name': 'Name',
+        'phone': 'Phone',
+        'username': 'Username',
+        'password': 'Password',
+        
+        # Customer form
+        'request_sharpening': 'Request Skate Sharpening',
+        'your_name': 'Your name',
+        'your_phone': 'Your phone number',
+        'skate_brand': 'Skate brand',
+        'skate_color': 'Color',
+        'skate_size': 'Size',
+        'submit_request': 'Submit request',
+        'select_brand': 'Select brand',
+        'select_color': 'Select color',
+        'select_size': 'Select size',
+        
+        # Ticket status
+        'unpaid': 'Unpaid',
+        'paid': 'Paid',
+        'in_progress': 'In Progress',
+        'completed': 'Completed',
+        
+        # Dashboard
+        'tickets_awaiting_payment': 'Tickets awaiting payment',
+        'ready_for_sharpening': 'Ready for sharpening',
+        'in_progress_tickets': 'Tickets in progress',
+        'completed_today': 'Completed today',
+        'claim_ticket': 'Claim ticket',
+        'complete_ticket': 'Complete ticket',
+        'ticket_code': 'Ticket code',
+        'customer': 'Customer',
+        'skates': 'Skates',
+        'created': 'Created',
+        'my_performance': 'My performance',
+        'average_rating': 'Average rating',
+        'total_feedback': 'Total feedback',
+        'recent_work': 'Recent work',
+        
+        # Payment
+        'payment': 'Payment',
+        'pay_for_sharpening': 'Pay for sharpening',
+        'amount': 'Amount',
+        'pay_now': 'Pay now',
+        'payment_success': 'Payment successful',
+        'payment_received': 'Payment received!',
+        'already_paid': 'Already paid',
+        
+        # Feedback
+        'feedback': 'Feedback',
+        'rate_service': 'Rate the service',
+        'rating': 'Rating',
+        'comment': 'Comment',
+        'submit_feedback': 'Submit feedback',
+        'thank_you': 'Thank you for your feedback!',
+        'stars': 'stars',
+        
+        # Messages
+        'ticket_request_sent': 'Ticket request sent! Check your phone for the ticket code and payment link.',
+        'name_phone_required': 'Name and phone number are required!',
+        'invalid_login': 'Invalid username or password',
+        'ticket_claimed': 'Claimed ticket {}',
+        'ticket_completed': 'Completed ticket {}. Customer notified!',
+        'cannot_complete': 'Cannot complete this ticket',
+        'ticket_not_available': 'Ticket is not available for sharpening',
+        'username_exists': 'Username already exists',
+        'sharpener_created': 'Sharpener {} created successfully!',
+        
+        # Admin
+        'create_sharpener': 'Create sharpener',
+        'existing_sharpeners': 'Existing sharpeners',
+        'create_account': 'Create account',
+        
+        # SMS Messages
+        'sms_ticket_created': """Your skate ticket: {}
+
+1. Write "{}" on paper with your skates
+2. Put skates on "to sharpen" shelf
+3. PAY BEFORE SHARPENING STARTS: {}
+
+💡 Send this payment link to your parents!
+⚠️ No payment = no sharpening
+
+Your skates: {}""",
+        
+        'sms_payment_received': """Payment received! ✅
+
+Ticket {} is now in the sharpening queue.
+You'll get an SMS when your skates are ready.
+
+Skates: {} {} {}""",
+        
+        'sms_skates_ready': """Your skates are ready for pickup! 🥅
+
+Ticket: {}
+Sharpened by: {}
+Skates: {} {} {}
+
+How did we do? Leave feedback: {}""",
+        
+        'sms_feedback_received': """New feedback received! {}
+
+From: {}
+Ticket: {}
+Rating: {}/5 stars"""
+    }
+}
+
+def get_language():
+    """Detect language from Accept-Language header"""
+    if hasattr(g, 'language'):
+        return g.language
+    
+    # Check Accept-Language header
+    accept_lang = request.headers.get('Accept-Language', '').lower()
+    
+    # Nordic languages use Danish
+    nordic_codes = ['da', 'dk', 'sv', 'se', 'no', 'nb', 'nn']
+    if any(code in accept_lang for code in nordic_codes):
+        g.language = 'da'
+    else:
+        g.language = 'en'
+    
+    return g.language
+
+def t(key, *args):
+    """Translate key to current language"""
+    lang = get_language()
+    translation = TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['en'].get(key, key))
+    
+    # Handle string formatting
+    if args:
+        try:
+            return translation.format(*args)
+        except:
+            return translation
+    return translation
+
+@app.context_processor
+def inject_translate():
+    """Make translation function available in all templates"""
+    return dict(t=t)
+
 # Helper Functions
 def generate_ticket_code():
     """Generate a 6-character ticket code"""
@@ -148,7 +413,7 @@ def request_ticket():
     size = int(request.form['size'])
 
     if not name or not phone:
-        flash('Name and phone number are required!')
+        flash(t('name_phone_required'))
         return redirect(url_for('index'))
 
     # Generate unique ticket code
@@ -179,20 +444,10 @@ def request_ticket():
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
     skate_details = f"{brand} {color} {size}"
 
-    sms_message = f"""Your skate ticket: {code}
-
-1. Write "{code}" on paper with your skates
-2. Put skates on "to sharpen" shelf
-3. PAY BEFORE SHARPENING STARTS: {payment_url}
-
-💡 Send this payment link to your parents!
-⚠️ No payment = no sharpening
-
-Your skates: {skate_details}"""
-
+    sms_message = t('sms_ticket_created', code, code, payment_url, skate_details)
     send_sms(phone, sms_message)
 
-    flash(f'Ticket request sent! Check your phone for the ticket code and payment link.')
+    flash(t('ticket_request_sent'))
     return redirect(url_for('index'))
 
 @app.route('/pay/<ticket_code>')
@@ -217,13 +472,7 @@ def payment_success(ticket_code):
     db.session.commit()
 
     # Send confirmation SMS
-    sms_message = f"""Payment received! ✅
-
-Ticket {ticket.code} is now in the sharpening queue.
-You'll get an SMS when your skates are ready.
-
-Skates: {ticket.brand} {ticket.color} {ticket.size}"""
-
+    sms_message = t('sms_payment_received', ticket.code, ticket.brand, ticket.color, ticket.size)
     send_sms(ticket.customer_phone, sms_message)
 
     return render_template('payment_success.html', ticket=ticket)
@@ -242,7 +491,7 @@ def sharpener_login():
             session['sharpener_name'] = sharpener.name
             return redirect(url_for('sharpener_dashboard'))
         else:
-            flash('Invalid username or password')
+            flash(t('invalid_login'))
 
     return render_template('sharpener_login.html')
 
@@ -294,7 +543,7 @@ def claim_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
 
     if ticket.status != 'paid':
-        flash('Ticket is not available for sharpening')
+        flash(t('ticket_not_available'))
         return redirect(url_for('sharpener_dashboard'))
 
     ticket.status = 'in_progress'
@@ -302,7 +551,7 @@ def claim_ticket(ticket_id):
     ticket.sharpened_by_id = session['sharpener_id']
     db.session.commit()
 
-    flash(f'Claimed ticket {ticket.code}')
+    flash(t('ticket_claimed', ticket.code))
     return redirect(url_for('sharpener_dashboard'))
 
 @app.route('/sharpener/complete/<int:ticket_id>')
@@ -312,7 +561,7 @@ def complete_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
 
     if ticket.status != 'in_progress' or ticket.sharpened_by_id != session['sharpener_id']:
-        flash('Cannot complete this ticket')
+        flash(t('cannot_complete'))
         return redirect(url_for('sharpener_dashboard'))
 
     ticket.status = 'completed'
@@ -323,17 +572,10 @@ def complete_ticket(ticket_id):
     sharpener_name = session['sharpener_name']
     feedback_url = f"{BASE_URL}/feedback/{ticket.code}"
 
-    sms_message = f"""Your skates are ready for pickup! 🥅
-
-Ticket: {ticket.code}
-Sharpened by: {sharpener_name}
-Skates: {ticket.brand} {ticket.color} {ticket.size}
-
-How did we do? Leave feedback: {feedback_url}"""
-
+    sms_message = t('sms_skates_ready', ticket.code, sharpener_name, ticket.brand, ticket.color, ticket.size, feedback_url)
     send_sms(ticket.customer_phone, sms_message)
 
-    flash(f'Completed ticket {ticket.code}. Customer notified!')
+    flash(t('ticket_completed', ticket.code))
     return redirect(url_for('sharpener_dashboard'))
 
 @app.route('/feedback/<ticket_code>', methods=['GET', 'POST'])
@@ -362,14 +604,10 @@ def feedback(ticket_code):
         # Notify sharpener about feedback
         if ticket.sharpener:
             stars = '⭐' * rating
-            sms_message = f"""New feedback received! {stars}
-
-From: {ticket.customer_name}
-Ticket: {ticket.code}
-Rating: {rating}/5 stars"""
-
+            sms_message = t('sms_feedback_received', stars, ticket.customer_name, ticket.code, rating)
+            
             if comment:
-                sms_message += f"\nComment: {comment}"
+                sms_message += f"\n{t('comment')}: {comment}"
 
             send_sms(ticket.sharpener.phone, sms_message)
 
@@ -388,7 +626,7 @@ def create_sharpener():
         password = request.form['password']
 
         if Sharpener.query.filter_by(username=username).first():
-            flash('Username already exists')
+            flash(t('username_exists'))
         else:
             sharpener = Sharpener(
                 name=name,
@@ -398,7 +636,7 @@ def create_sharpener():
             )
             db.session.add(sharpener)
             db.session.commit()
-            flash(f'Sharpener {name} created successfully!')
+            flash(t('sharpener_created', name))
             return redirect(url_for('create_sharpener'))
 
     sharpeners = Sharpener.query.all()
