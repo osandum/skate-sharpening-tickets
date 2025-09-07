@@ -83,3 +83,33 @@ Required for production (simulation mode for development):
 - SQLite for development (auto-created in `instance/` directory)
 - All models defined in app.py:28-71
 - Database initialization in `create_tables()` function
+
+## Docker Deployment
+
+### Building and Running
+```bash
+# Build image
+docker build -t skate-sharpening .
+
+# Run container
+docker run -p 8080:5000 \
+  -e GATEWAYAPI_TOKEN=your-token \
+  -e STRIPE_SECRET_KEY=your-key \
+  -e BASE_URL=https://yourdomain.com \
+  skate-sharpening
+
+# Using docker-compose (recommended)
+docker-compose up -d
+```
+
+### Environment Variables
+- `GATEWAYAPI_TOKEN` - SMS service token
+- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` - Payment processing
+- `BASE_URL` - Public URL for SMS links  
+- `SECRET_KEY` - Flask session security (generate random 32+ chars)
+
+### Production Notes
+- App runs on port 5000 inside container
+- Database persisted in `./data` volume when using docker-compose
+- Health checks included for container orchestration
+- Non-root user for security

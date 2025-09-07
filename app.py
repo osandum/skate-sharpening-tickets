@@ -649,4 +649,5 @@ def create_tables():
 
 if __name__ == '__main__':
     create_tables()  # Create tables on startup
-    app.run(debug=True)
+    # Bind to 0.0.0.0 for Docker compatibility
+    app.run(host='0.0.0.0', port=5000, debug=True)

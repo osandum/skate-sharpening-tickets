@@ -1,0 +1,58 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# SQLite databases (will be created in container)
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Environment files (use environment variables in production)
+.env
+.envrc
+
+# Documentation
+README.md
+setup.txt
+CLAUDE.md
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+.tmp/
+temp/
+/tmp/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

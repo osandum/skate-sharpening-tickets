@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  skate-sharpening:
+    build: .
+    ports:
+      - "8080:5000"
+    environment:
+      # Production environment variables
+      - FLASK_ENV=production
+      - GATEWAYAPI_TOKEN=${GATEWAYAPI_TOKEN:-}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY:-}
+      - BASE_URL=${BASE_URL:-http://localhost:8080}
+      - SECRET_KEY=${SECRET_KEY:-your-very-secret-key-change-this}
+    volumes:
+      # Persist SQLite database
+      - ./data:/app/instance
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
