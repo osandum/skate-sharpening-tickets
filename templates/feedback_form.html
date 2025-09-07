@@ -1,19 +1,19 @@
 <!-- templates/feedback_form.html -->
 {% extends "base.html" %}
-{% block title %}Feedback for {{ ticket.code }}{% endblock %}
+{% block title %}{{ t('feedback') }} - {{ ticket.code }}{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">
-            ⭐ How did we do?
+            ⭐ {{ t('rate_service') }}
         </h1>
 
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-green-800 mb-2">Your Sharpening:</h3>
             <div class="text-sm space-y-1">
-                <div><strong>Ticket:</strong> {{ ticket.code }}</div>
-                <div><strong>Skates:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
+                <div><strong>{{ t('ticket_code') }}:</strong> {{ ticket.code }}</div>
+                <div><strong>{{ t('skates') }}:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
                 <div><strong>Sharpened by:</strong> {{ ticket.sharpener.name if ticket.sharpener else 'Unknown' }}</div>
                 <div><strong>Completed:</strong> {{ ticket.completed_at.strftime('%d/%m %H:%M') if ticket.completed_at else 'Unknown' }}</div>
             </div>
@@ -22,7 +22,7 @@
         <form action="{{ url_for('feedback', ticket_code=ticket.code) }}" method="POST" class="space-y-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-4 text-center">
-                    How do your skates feel? *
+                    {{ t('rate_service') }} *
                 </label>
                 <div class="flex justify-center space-x-2">
                     {% for i in range(1, 6) %}
@@ -39,7 +39,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Comments (optional)
+                    {{ t('comment') }} (optional)
                 </label>
                 <textarea name="comment" rows="3"
                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -47,7 +47,7 @@
             </div>
 
             <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
-                Submit Feedback
+                {{ t('submit_feedback') }}
             </button>
         </form>
     </div>

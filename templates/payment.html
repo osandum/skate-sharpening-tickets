@@ -1,21 +1,21 @@
 <!-- templates/payment.html -->
 {% extends "base.html" %}
-{% block title %}Pay for Ticket {{ ticket.code }}{% endblock %}
+{% block title %}{{ t('payment') }} - {{ ticket.code }}{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">
-            💳 Pay for Sharpening
+            💳 {{ t('pay_for_sharpening') }}
         </h1>
 
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 class="font-semibold text-blue-800 mb-2">Ticket Details:</h3>
+            <h3 class="font-semibold text-blue-800 mb-2">{{ t('ticket_code') }}:</h3>
             <div class="text-sm space-y-1">
-                <div><strong>Code:</strong> {{ ticket.code }}</div>
-                <div><strong>Customer:</strong> {{ ticket.customer_name }}</div>
-                <div><strong>Skates:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
-                <div><strong>Amount:</strong> 25 DKK</div>
+                <div><strong>{{ t('ticket_code') }}:</strong> {{ ticket.code }}</div>
+                <div><strong>{{ t('customer') }}:</strong> {{ ticket.customer_name }}</div>
+                <div><strong>{{ t('skates') }}:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
+                <div><strong>{{ t('amount') }}:</strong> 25 DKK</div>
             </div>
         </div>
 
@@ -29,7 +29,7 @@
         <!-- In real implementation, integrate Stripe Elements here -->
         <div class="space-y-4">
             <button onclick="simulatePayment()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
-                📱 Pay with MobilePay (25 DKK)
+                📱 {{ t('pay_now') }} (25 DKK)
             </button>
 
             <div class="text-center">
