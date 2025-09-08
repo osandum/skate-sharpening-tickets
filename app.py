@@ -187,7 +187,36 @@ Hvordan gik det? Giv feedback: {}""",
 
 Fra: {}
 Billet: {}
-Bedømmelse: {}/5 stjerner"""
+Bedømmelse: {}/5 stjerner""",
+        
+        # How it works section
+        'how_it_works': 'Sådan fungerer det',
+        'step_1_fill_details': 'Udfyld dine oplysninger nedenfor',
+        'step_2_get_sms': 'Få billetkode via SMS',
+        'step_3_write_code': 'Skriv kode på papir med dine skøjter',
+        'step_4_pay_sms': 'Betal med SMS-linket (forældre kan også betale!)',
+        'step_5_pickup_sms': 'Få SMS når skøjterne er klar',
+        
+        # Skate details section
+        'your_skate_details': 'Dine skøjtedetaljer',
+        'exact_details_warning': 'Vælg de EKSAKTE detaljer for DINE skøjter for at undgå forveksling!',
+        
+        # Bottom info
+        'payment_link_info': 'Betalingslinket kan videregives til forældre',
+        'payment_required_info': 'Slibning starter først efter betaling',
+        
+        # Brand translations
+        'brand_jackson': 'Jackson',
+        'brand_edea': 'EDEA',
+        'brand_risport': 'Risport',
+        'brand_riedell': 'Riedell',
+        'brand_graf': 'Graf',
+        'brand_other': 'Andre',
+        
+        # Color translations
+        'color_white': 'Hvid',
+        'color_black': 'Sort',
+        'color_other': 'Andre'
     },
     'en': {
         # General
@@ -300,7 +329,36 @@ How did we do? Leave feedback: {}""",
 
 From: {}
 Ticket: {}
-Rating: {}/5 stars"""
+Rating: {}/5 stars""",
+        
+        # How it works section
+        'how_it_works': 'How it works',
+        'step_1_fill_details': 'Fill out your details below',
+        'step_2_get_sms': 'Get ticket code via SMS',
+        'step_3_write_code': 'Write code on paper with your skates',
+        'step_4_pay_sms': 'Pay using the SMS link (parents can pay too!)',
+        'step_5_pickup_sms': 'Get SMS when skates are ready',
+        
+        # Skate details section
+        'your_skate_details': 'Your Skate Details',
+        'exact_details_warning': 'Select the EXACT details of YOUR skates to prevent mix-ups!',
+        
+        # Bottom info
+        'payment_link_info': 'The payment link can be forwarded to parents',
+        'payment_required_info': 'Sharpening only starts after payment',
+        
+        # Brand translations
+        'brand_jackson': 'Jackson',
+        'brand_edea': 'EDEA',
+        'brand_risport': 'Risport',
+        'brand_riedell': 'Riedell',
+        'brand_graf': 'Graf',
+        'brand_other': 'Other',
+        
+        # Color translations
+        'color_white': 'White',
+        'color_black': 'Black',
+        'color_other': 'Other'
     }
 }
 
@@ -308,24 +366,24 @@ def get_language():
     """Detect language from Accept-Language header"""
     if hasattr(g, 'language'):
         return g.language
-    
+
     # Check Accept-Language header
     accept_lang = request.headers.get('Accept-Language', '').lower()
-    
+
     # Nordic languages use Danish
     nordic_codes = ['da', 'dk', 'sv', 'se', 'no', 'nb', 'nn']
     if any(code in accept_lang for code in nordic_codes):
         g.language = 'da'
     else:
         g.language = 'en'
-    
+
     return g.language
 
 def t(key, *args):
     """Translate key to current language"""
     lang = get_language()
     translation = TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['en'].get(key, key))
-    
+
     # Handle string formatting
     if args:
         try:
@@ -351,7 +409,7 @@ def send_sms(phone, message):
         print(f"SMS to {phone}: {message}")
         return True
 
-    url = "https://gatewayapi.com/rest/mtsms"
+    url = "https://gatwayapi.eu/rest/mtsms"
     headers = {
         "Authorization": f"Bearer {GATEWAYAPI_TOKEN}",
         "Content-Type": "application/json"
@@ -401,8 +459,21 @@ def favicon():
 @app.route('/')
 def index():
     """Customer ticket request page"""
-    brands = ['Jackson', 'EDEA', 'Risport', 'Riedell', 'Graf', 'Other']
-    colors = ['White', 'Black', 'Other']
+    # Brands as tuples (key, value) for translation
+    brands = [
+        ('jackson', 'Jackson'),
+        ('edea', 'EDEA'),
+        ('risport', 'Risport'),
+        ('riedell', 'Riedell'),
+        ('graf', 'Graf'),
+        ('other', 'Other')
+    ]
+    # Colors as tuples (key, value) for translation
+    colors = [
+        ('white', 'White'),
+        ('black', 'Black'),
+        ('other', 'Other')
+    ]
     sizes = list(range(24, 47))  # 24-46
 
     return render_template('customer.html', brands=brands, colors=colors, sizes=sizes)
@@ -609,7 +680,7 @@ def feedback(ticket_code):
         if ticket.sharpener:
             stars = '⭐' * rating
             sms_message = t('sms_feedback_received', stars, ticket.customer_name, ticket.code, rating)
-            
+
             if comment:
                 sms_message += f"\n{t('comment')}: {comment}"
 
@@ -651,7 +722,9 @@ def create_tables():
     with app.app_context():
         db.create_all()
 
+# Create tables on import (works with both 'python app.py' and 'flask run')
+create_tables()
+
 if __name__ == '__main__':
-    create_tables()  # Create tables on startup
     # Bind to 0.0.0.0 for Docker compatibility
     app.run(host='0.0.0.0', port=5000, debug=True)
