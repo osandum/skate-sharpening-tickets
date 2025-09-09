@@ -1,22 +1,22 @@
 <!-- templates/customer.html -->
 {% extends "base.html" %}
-{% block title %}{{ t('request_sharpening') }}{% endblock %}
+{% block title %}{{ t('title') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
-            ⛸️ {{ t('request_sharpening') }}
+            ⛸️ {{ t('title') }}
         </h1>
 
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-blue-800 mb-2">📱 {{ t('how_it_works') }}:</h3>
-            <ol class="text-sm text-blue-700 space-y-1">
-                <li>1. {{ t('step_1_fill_details') }}</li>
-                <li>2. {{ t('step_2_get_sms') }}</li>
-                <li>3. {{ t('step_3_write_code') }}</li>
-                <li>4. {{ t('step_4_pay_sms') }}</li>
-                <li>5. {{ t('step_5_pickup_sms') }}</li>
+            <ol class="list-decimal list-outside text-sm text-blue-700 space-y-1 pl-6">
+                <li>{{ t('step_1_fill_details') }}</li>
+                <li>{{ t('step_2_get_sms') }}</li>
+                <li>{{ t('step_3_write_code') }}</li>
+                <li>{{ t('step_4_pay_sms') }}</li>
+                <li>{{ t('step_5_pickup_sms') }}</li>
             </ol>
         </div>
 
@@ -32,7 +32,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ t('your_phone') }} *
+                    {{ t('phone_label') }} *
                 </label>
                 <input type="tel" name="phone" required
                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -82,7 +82,7 @@
             </div>
 
             <button type="submit" class="w-full btn-primary text-lg">
-                📱 {{ t('submit_request') }}
+                📱 {{ t('submit_button') }}
             </button>
         </form>
 

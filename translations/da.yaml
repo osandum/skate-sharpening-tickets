@@ -1,9 +1,14 @@
 # Danish translations
+skate_sharpening: "Skøjteslibning"
 title: "Anmod om slibning af skøjter"
 subtitle: "Sliber skarpt på 60 sekunder! 💨"
 phone_label: "Dit mobilnummer"
 phone_placeholder: "43 12 34 56"
+your_name: "Dit navn"
 select_brand: "Vælg mærke"
+skate_brand: "Skøjtemærke"
+skate_color: "Skøjtefarve"
+skate_size: "Skøjtestørrelse"
 select_color: "Vælg farve"
 select_size: "Vælg størrelse"
 submit_button: "Send anmodning 📱"
@@ -33,7 +38,7 @@ sms_ticket_completed: |
   🎉 SKØJTER KLAR!
 
   Billet: {code}
-  Dine skøjter er skarpe og klar til afhentning! 
+  Dine skøjter er skarpe og klar til afhentning!
 
   Hvordan gik det? Giv feedback: {feedback_url}
 
@@ -77,18 +82,32 @@ color_other: "Andre"
 
 # Sharpener interface
 sharpener_login_title: "Sliber Login"
+sharpener_dashboard: "Sliber Dashboard"
 username: "Brugernavn"
 password: "Adgangskode"
 login: "Log ind"
+logout: "Log ud"
+name: "Navn"
+phone: "Telefon"
 invalid_login: "Ugyldige loginoplysninger"
 
 dashboard_title: "Sliberdashboard"
 welcome_back: "Velkommen tilbage"
-logout: "Log ud"
 
 # Ticket statuses
 unpaid_tickets: "Ubetalte billetter"
 your_tickets: "Dine billetter"
+tickets_awaiting_payment: "Billetter venter på betaling"
+ready_for_sharpening: "Klar til slibning"
+in_progress_tickets: "Billetter under bearbejdning"
+in_progress: "Under bearbejdning"
+my_performance: "Min præstation"
+average_rating: "Gennemsnitlig bedømmelse"
+total_feedback: "Total feedback"
+recent_work: "Seneste arbejde"
+skates: "Skøjter"
+customer: "Kunde"
+created: "Oprettet"
 completed_today: "Færdiggjort i dag"
 
 status_unpaid: "Ubetalt"
@@ -117,23 +136,42 @@ avg_time: "Gennemsnitlig tid"
 
 # Feedback
 feedback_title: "Feedback til slibning"
-your_name: "Dit navn"
+feedback: "Feedback"
+rate_service: "Bedøm servicen"
 your_name_placeholder: "Skriv dit navn"
 rating: "Bedømmelse"
 rating_label: "Hvor mange stjerner giver du os?"
 comment: "Kommentar"
 comment_placeholder: "Fortæl os hvordan det gik (valgfrit)"
 submit_feedback: "Send feedback"
-feedback_thanks: "Tak for din feedback!"
+feedback_thanks:
+  title: "Tak for din feedback!"
+  message: "Din vurdering hjælper os med at forbedre vores service."
+  your_ticket: "Dit nummer"
+  your_rating: "Din vurdering"
+  new_ticket: "Ny billet"
+feedback_already_given:
+  title: "Feedback allerede givet"
+  message: "Du har allerede givet feedback for denne billet."
+  ticket_code: "Billetnummer"
+  previous_rating: "Din tidligere vurdering"
+  new_ticket: "Ny billet"
 
 # Admin
 admin_title: "Opret sliber"
+create_sharpener: "Opret sliber"
 admin_create_account: "Opret konto"
+create_account: "Opret konto"
+existing_sharpeners: "Eksisterende slibere"
 admin_account_created: "Konto oprettet!"
 
 # Payment
 payment_title: "Betal for slibning"
+payment: "Betaling"
+pay_for_sharpening: "Betal for slibning"
 payment_amount: "Beløb"
+amount: "Beløb"
+pay_now: "Betal nu"
 payment_description: "Slibning af skøjter"
 pay_with_mobilepay: "Betal med MobilePay"
 payment_success_title: "Betaling gennemført!"
