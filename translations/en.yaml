@@ -1,0 +1,141 @@
+# English translations
+title: "Request Skate Sharpening"
+subtitle: "Sharp skates in 60 seconds! 💨"
+phone_label: "Your phone number"
+phone_placeholder: "43 12 34 56"
+select_brand: "Select brand"
+select_color: "Select color"
+select_size: "Select size"
+submit_button: "Send request 📱"
+
+# SMS messages
+sms_ticket_created: |
+  🏒 SKATE SHARPENING
+
+  Your ticket: {code}
+  Phone: {phone}
+
+  WRITE THE CODE on paper with your skates and give them to staff.
+
+  Pay here: {payment_url}
+
+  Sharpening starts after payment.
+
+sms_payment_confirmed: |
+  ✅ PAYMENT CONFIRMED
+
+  Ticket: {code}
+  We're sharpening your skates now!
+
+  Expected ready: {estimated_time}
+
+sms_ticket_completed: |
+  🎉 SKATES READY!
+
+  Ticket: {code}
+  Your skates are sharp and ready for pickup!
+
+  How did we do? Leave feedback: {feedback_url}
+
+feedback_email_subject: "New skate sharpening feedback"
+
+feedback_email_body: |
+  New feedback received:
+
+  From: {name}
+  Ticket: {code}
+  Rating: {rating}/5 stars
+
+# How it works section
+how_it_works: "How it works"
+step_1_fill_details: "Fill out your details below"
+step_2_get_sms: "Get ticket code via SMS"
+step_3_write_code: "Write code on paper with your skates"
+step_4_pay_sms: "Pay using the SMS link (parents can pay too!)"
+step_5_pickup_sms: "Get SMS when skates are ready"
+
+# Skate details section
+your_skate_details: "Your Skate Details"
+exact_details_warning: "Select the EXACT details of YOUR skates to prevent mix-ups!"
+
+# Bottom info
+payment_link_info: "The payment link can be forwarded to parents"
+payment_required_info: "Sharpening only starts after payment"
+
+# Brand translations
+brand_jackson: "Jackson"
+brand_edea: "EDEA"
+brand_risport: "Risport"
+brand_riedell: "Riedell"
+brand_graf: "Graf"
+brand_other: "Other"
+
+# Color translations
+color_white: "White"
+color_black: "Black"
+color_other: "Other"
+
+# Sharpener interface
+sharpener_login_title: "Sharpener Login"
+username: "Username"
+password: "Password"
+login: "Login"
+invalid_login: "Invalid credentials"
+
+dashboard_title: "Sharpener Dashboard"
+welcome_back: "Welcome back"
+logout: "Logout"
+
+# Ticket statuses
+unpaid_tickets: "Unpaid Tickets"
+your_tickets: "Your Tickets"
+completed_today: "Completed Today"
+
+status_unpaid: "Unpaid"
+status_paid: "Paid"
+status_in_progress: "In Progress"
+status_completed: "Completed"
+
+claim_ticket: "Claim"
+complete_ticket: "Complete"
+
+ticket_details: "Ticket Details"
+ticket_code: "Ticket Code"
+phone_number: "Phone Number"
+skate_details: "Skate Details"
+brand: "Brand"
+color: "Color"
+size: "Size"
+created_at: "Created"
+claimed_at: "Claimed"
+completed_at: "Completed"
+
+no_tickets: "No tickets"
+performance_today: "Performance Today"
+tickets_completed: "Tickets completed"
+avg_time: "Average time"
+
+# Feedback
+feedback_title: "Sharpening Feedback"
+your_name: "Your name"
+your_name_placeholder: "Enter your name"
+rating: "Rating"
+rating_label: "How many stars do you give us?"
+comment: "Comment"
+comment_placeholder: "Tell us how it went (optional)"
+submit_feedback: "Submit feedback"
+feedback_thanks: "Thank you for your feedback!"
+
+# Admin
+admin_title: "Create Sharpener"
+admin_create_account: "Create Account"
+admin_account_created: "Account created!"
+
+# Payment
+payment_title: "Pay for Sharpening"
+payment_amount: "Amount"
+payment_description: "Skate sharpening"
+pay_with_mobilepay: "Pay with MobilePay"
+payment_success_title: "Payment completed!"
+payment_success_message: "Your payment has been received. Sharpening will begin now!"
+return_home: "Return home"

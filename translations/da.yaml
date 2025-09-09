@@ -1,0 +1,141 @@
+# Danish translations
+title: "Anmod om slibning af skøjter"
+subtitle: "Sliber skarpt på 60 sekunder! 💨"
+phone_label: "Dit mobilnummer"
+phone_placeholder: "43 12 34 56"
+select_brand: "Vælg mærke"
+select_color: "Vælg farve"
+select_size: "Vælg størrelse"
+submit_button: "Send anmodning 📱"
+
+# SMS messages
+sms_ticket_created: |
+  🏒 SKØJTESLIBNING
+
+  Din billet: {code}
+  Mobil: {phone}
+
+  SKRIV KODEN på papir med dine skøjter og aflever dem til personalet.
+
+  Betal her: {payment_url}
+
+  Slibning starter efter betaling.
+
+sms_payment_confirmed: |
+  ✅ BETALING BEKRÆFTET
+
+  Billet: {code}
+  Vi sliberpå dine skøjter nu!
+
+  Forventet klar: {estimated_time}
+
+sms_ticket_completed: |
+  🎉 SKØJTER KLAR!
+
+  Billet: {code}
+  Dine skøjter er skarpe og klar til afhentning! 
+
+  Hvordan gik det? Giv feedback: {feedback_url}
+
+feedback_email_subject: "Ny feedback fra skøjteslibning"
+
+feedback_email_body: |
+  Ny feedback modtaget:
+
+  Fra: {name}
+  Billet: {code}
+  Bedømmelse: {rating}/5 stjerner
+
+# How it works section
+how_it_works: "Sådan fungerer det"
+step_1_fill_details: "Udfyld dine oplysninger nedenfor"
+step_2_get_sms: "Få billetkode via SMS"
+step_3_write_code: "Skriv kode på papir med dine skøjter"
+step_4_pay_sms: "Betal med SMS-linket (forældre kan også betale!)"
+step_5_pickup_sms: "Få SMS når skøjterne er klar"
+
+# Skate details section
+your_skate_details: "Dine skøjtedetaljer"
+exact_details_warning: "Vælg de EKSAKTE detaljer for DINE skøjter for at undgå forveksling!"
+
+# Bottom info
+payment_link_info: "Betalingslinket kan videregives til forældre"
+payment_required_info: "Slibning starter først efter betaling"
+
+# Brand translations
+brand_jackson: "Jackson"
+brand_edea: "EDEA"
+brand_risport: "Risport"
+brand_riedell: "Riedell"
+brand_graf: "Graf"
+brand_other: "Andre"
+
+# Color translations
+color_white: "Hvid"
+color_black: "Sort"
+color_other: "Andre"
+
+# Sharpener interface
+sharpener_login_title: "Sliber Login"
+username: "Brugernavn"
+password: "Adgangskode"
+login: "Log ind"
+invalid_login: "Ugyldige loginoplysninger"
+
+dashboard_title: "Sliberdashboard"
+welcome_back: "Velkommen tilbage"
+logout: "Log ud"
+
+# Ticket statuses
+unpaid_tickets: "Ubetalte billetter"
+your_tickets: "Dine billetter"
+completed_today: "Færdiggjort i dag"
+
+status_unpaid: "Ubetalt"
+status_paid: "Betalt"
+status_in_progress: "I gang"
+status_completed: "Færdig"
+
+claim_ticket: "Claim"
+complete_ticket: "Færdiggør"
+
+ticket_details: "Billetdetaljer"
+ticket_code: "Billetkode"
+phone_number: "Telefonnummer"
+skate_details: "Skøjtedetaljer"
+brand: "Mærke"
+color: "Farve"
+size: "Størrelse"
+created_at: "Oprettet"
+claimed_at: "Claimed"
+completed_at: "Færdiggjort"
+
+no_tickets: "Ingen billetter"
+performance_today: "Præstation i dag"
+tickets_completed: "Billetter færdiggjort"
+avg_time: "Gennemsnitlig tid"
+
+# Feedback
+feedback_title: "Feedback til slibning"
+your_name: "Dit navn"
+your_name_placeholder: "Skriv dit navn"
+rating: "Bedømmelse"
+rating_label: "Hvor mange stjerner giver du os?"
+comment: "Kommentar"
+comment_placeholder: "Fortæl os hvordan det gik (valgfrit)"
+submit_feedback: "Send feedback"
+feedback_thanks: "Tak for din feedback!"
+
+# Admin
+admin_title: "Opret sliber"
+admin_create_account: "Opret konto"
+admin_account_created: "Konto oprettet!"
+
+# Payment
+payment_title: "Betal for slibning"
+payment_amount: "Beløb"
+payment_description: "Slibning af skøjter"
+pay_with_mobilepay: "Betal med MobilePay"
+payment_success_title: "Betaling gennemført!"
+payment_success_message: "Din betaling er modtaget. Slibning starter nu!"
+return_home: "Tilbage til forsiden"
