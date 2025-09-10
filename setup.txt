@@ -74,7 +74,7 @@ flask run
 ## API Integration Setup
 
 ### GatewayAPI (SMS)
-# 1. Sign up at gatwayapi.eu
+# 1. Sign up at gatewayapi.eu
 # 2. Get API token from dashboard
 # 3. Test with a few SMS to verify Danish mobile numbers work
 # 4. Set credit limit appropriate for your usage
@@ -176,5 +176,5 @@ skate-sharpening/
 ## Support
 # For Flask issues: https://flask.palletsprojects.com/
 # For SQLAlchemy: https://docs.sqlalchemy.org/
-# For GatewayAPI: https://gatwayapi.eu/docs/
+# For GatewayAPI: https://gatewayapi.eu/docs/
 # For Stripe: https://stripe.com/docs/
