@@ -66,6 +66,14 @@ exact_details_warning: "Udfyldes for at undgå forveksling med andres skøjter"
 payment_link_info: "Betalingslinket kan videregives til forældre"
 payment_required_info: "Slibning starter først efter betaling"
 
+# Security
+captcha_failed: "Venligst fuldfør sikkerhedsverifikationen"
+
+# Form validation
+all_fields_required: "Venligst udfyld alle påkrævede felter"
+invalid_size: "Venligst vælg en gyldig skøjtestørrelse (24-46)"
+form_error: "Der opstod en fejl med din anmodning. Prøv venligst igen."
+
 # Brand translations
 brand_jackson: "Jackson"
 brand_edea: "EDEA"
