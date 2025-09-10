@@ -32,6 +32,8 @@ GATEWAYAPI_TOKEN = os.environ.get('GATEWAYAPI_TOKEN', 'your-gatewayapi-token')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'your-stripe-publishable-key')
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
+RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
+RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 
 # Database Models
 class Sharpener(db.Model):
@@ -128,7 +130,7 @@ def t(key, *args):
 @app.context_processor
 def inject_translate():
     """Make translation function available in all templates"""
-    return dict(t=t)
+    return dict(t=t, recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 # Helper Functions
 def generate_ticket_code():
@@ -181,6 +183,49 @@ def send_sms(phone, message):
 
     except Exception as e:
         print(f"[SMS] Error sending SMS: {str(e)}")
+        return False
+
+def verify_recaptcha(response_token, min_score=0.5):
+    """Verify reCAPTCHA v3 response with Google"""
+    if not RECAPTCHA_SECRET_KEY or RECAPTCHA_SECRET_KEY == '':
+        # Skip verification in development if no key is set
+        print("[reCAPTCHA v3] No secret key set, skipping verification")
+        return True
+
+    if not response_token:
+        print("[reCAPTCHA v3] No response token provided")
+        return False
+
+    try:
+        verification_data = {
+            'secret': RECAPTCHA_SECRET_KEY,
+            'response': response_token,
+            'remoteip': request.environ.get('REMOTE_ADDR')
+        }
+
+        response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data=verification_data
+        )
+
+        result = response.json()
+        success = result.get('success', False)
+        score = result.get('score', 0.0)
+        action = result.get('action', '')
+
+        print(f"[reCAPTCHA v3] Score: {score}, Action: {action}, Success: {success}")
+
+        if success and score >= min_score and action == 'ticket_request':
+            print(f"[reCAPTCHA v3] Verification passed (score: {score})")
+            return True
+        else:
+            print(f"[reCAPTCHA v3] Verification failed - Score: {score}, Min required: {min_score}")
+            if not success:
+                print(f"[reCAPTCHA v3] Error codes: {result.get('error-codes', [])}")
+            return False
+
+    except Exception as e:
+        print(f"[reCAPTCHA v3] Error verifying: {str(e)}")
         return False
 
 def create_stripe_payment_intent(amount, ticket):
@@ -238,14 +283,37 @@ def index():
 @app.route('/request_ticket', methods=['POST'])
 def request_ticket():
     """Process ticket request"""
-    name = request.form['name'].strip()
-    phone = request.form['phone'].strip()
-    brand = request.form['brand']
-    color = request.form['color']
-    size = int(request.form['size'])
+    try:
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        brand = request.form.get('brand', '')
+        color = request.form.get('color', '')
+        size_str = request.form.get('size', '')
+        
+        # Validate all required fields
+        if not name or not phone or not brand or not color or not size_str:
+            flash(t('all_fields_required'))
+            return redirect(url_for('index'))
+        
+        # Validate size is a valid integer
+        try:
+            size = int(size_str)
+            if size < 24 or size > 46:
+                flash(t('invalid_size'))
+                return redirect(url_for('index'))
+        except ValueError:
+            flash(t('invalid_size'))
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        print(f"[ERROR] Form validation error: {str(e)}")
+        flash(t('form_error'))
+        return redirect(url_for('index'))
 
-    if not name or not phone:
-        flash(t('name_phone_required'))
+    # Verify reCAPTCHA
+    recaptcha_response = request.form.get('g-recaptcha-response')
+    if not verify_recaptcha(recaptcha_response):
+        flash(t('captcha_failed'))
         return redirect(url_for('index'))
 
     # Generate unique ticket code

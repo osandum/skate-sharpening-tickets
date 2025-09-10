@@ -66,6 +66,14 @@ exact_details_warning: "Fill these to help prevent mix-ups with other skates"
 payment_link_info: "The payment link can be forwarded to parents"
 payment_required_info: "Sharpening only starts after payment"
 
+# Security
+captcha_failed: "Please complete the security verification"
+
+# Form validation
+all_fields_required: "Please fill in all required fields"
+invalid_size: "Please select a valid skate size (24-46)"
+form_error: "There was an error with your request. Please try again."
+
 # Brand translations
 brand_jackson: "Jackson"
 brand_edea: "EDEA"
