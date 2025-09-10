@@ -1,6 +1,6 @@
 # English translations
 skate_sharpening: "Skate Sharpening"
-title: "Request Skate Sharpening"
+title: "Get your Skates Sharpened"
 subtitle: "Sharp skates in 60 seconds! 💨"
 phone_label: "Your phone number"
 phone_placeholder: "43 12 34 56"
@@ -15,12 +15,11 @@ submit_button: "Send request 📱"
 
 # SMS messages
 sms_ticket_created: |
-  🏒 SKATE SHARPENING
+  ✨ SKATE SHARPENING
 
   Your ticket: {code}
-  Phone: {phone}
 
-  WRITE THE CODE on paper with your skates and give them to staff.
+  Write the ticket code and your name on a piece of paper. Place it in the skates at drop-off.
 
   Pay here: {payment_url}
 
@@ -54,14 +53,14 @@ feedback_email_body: |
 # How it works section
 how_it_works: "How it works"
 step_1_fill_details: "Fill out your details below"
-step_2_get_sms: "Get ticket code via SMS"
-step_3_write_code: "Write code on paper with your skates"
+step_2_get_sms: "Get a ticket code via SMS"
+step_3_write_code: "Put note with ticket code and name in skates"
 step_4_pay_sms: "Pay using the SMS link (parents can pay too!)"
 step_5_pickup_sms: "Get SMS when skates are ready"
 
 # Skate details section
-your_skate_details: "Your Skate Details"
-exact_details_warning: "Select the EXACT details of YOUR skates to prevent mix-ups!"
+your_skate_details: "Your Skates"
+exact_details_warning: "Fill these to help prevent mix-ups with other skates"
 
 # Bottom info
 payment_link_info: "The payment link can be forwarded to parents"

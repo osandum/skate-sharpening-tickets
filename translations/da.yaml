@@ -1,26 +1,25 @@
 # Danish translations
 skate_sharpening: "Skøjteslibning"
-title: "Anmod om slibning af skøjter"
+title: "Få skøjterne slebet"
 subtitle: "Sliber skarpt på 60 sekunder! 💨"
 phone_label: "Dit mobilnummer"
 phone_placeholder: "43 12 34 56"
 your_name: "Dit navn"
 select_brand: "Vælg mærke"
-skate_brand: "Skøjtemærke"
-skate_color: "Skøjtefarve"
-skate_size: "Skøjtestørrelse"
+skate_brand: "Mærke"
+skate_color: "Farve"
+skate_size: "Størrelse"
 select_color: "Vælg farve"
 select_size: "Vælg størrelse"
 submit_button: "Send anmodning 📱"
 
 # SMS messages
 sms_ticket_created: |
-  🏒 SKØJTESLIBNING
+  ✨ SKØJTESLIBNING
 
   Din billet: {code}
-  Mobil: {phone}
 
-  SKRIV KODEN på papir med dine skøjter og aflever dem til personalet.
+  Skriv billetkoden og dit navn på et stykke papir. Læg det i skøjterne ved indlevering.
 
   Betal her: {payment_url}
 
@@ -53,15 +52,15 @@ feedback_email_body: |
 
 # How it works section
 how_it_works: "Sådan fungerer det"
-step_1_fill_details: "Udfyld dine oplysninger nedenfor"
-step_2_get_sms: "Få billetkode via SMS"
-step_3_write_code: "Skriv kode på papir med dine skøjter"
-step_4_pay_sms: "Betal med SMS-linket (forældre kan også betale!)"
+step_1_fill_details: "Udfyld felterne nedenfor"
+step_2_get_sms: "Få en billetkode via SMS"
+step_3_write_code: "Læg seddel med billedkode og navn i skøjterne"
+step_4_pay_sms: "Betal med MobilePay (forældre kan også betale!)"
 step_5_pickup_sms: "Få SMS når skøjterne er klar"
 
 # Skate details section
-your_skate_details: "Dine skøjtedetaljer"
-exact_details_warning: "Vælg de EKSAKTE detaljer for DINE skøjter for at undgå forveksling!"
+your_skate_details: "Dine skøjter"
+exact_details_warning: "Udfyldes for at undgå forveksling med andres skøjter"
 
 # Bottom info
 payment_link_info: "Betalingslinket kan videregives til forældre"
@@ -76,8 +75,8 @@ brand_graf: "Graf"
 brand_other: "Andre"
 
 # Color translations
-color_white: "Hvid"
-color_black: "Sort"
+color_white: "Hvide"
+color_black: "Sorte"
 color_other: "Andre"
 
 # Sharpener interface
