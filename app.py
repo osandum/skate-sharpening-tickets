@@ -114,15 +114,18 @@ def get_language():
 
     return g.language
 
-def t(key, *args):
+def t(key, *args, **kwargs):
     """Translate key to current language"""
     lang = get_language()
     translation = TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['en'].get(key, key))
 
     # Handle string formatting
-    if args:
+    if args or kwargs:
         try:
-            return translation.format(*args)
+            if kwargs:
+                return translation.format(**kwargs)
+            else:
+                return translation.format(*args)
         except:
             return translation
     return translation
@@ -344,7 +347,7 @@ def request_ticket():
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
     skate_details = f"{brand} {color} {size}"
 
-    sms_message = t('sms_ticket_created', code, code, payment_url, skate_details)
+    sms_message = t('sms_ticket_created', code=code, payment_url=payment_url)
     send_sms(phone, sms_message)
 
     flash(t('ticket_request_sent'))
@@ -372,7 +375,7 @@ def payment_success(ticket_code):
     db.session.commit()
 
     # Send confirmation SMS
-    sms_message = t('sms_payment_received', ticket.code, ticket.brand, ticket.color, ticket.size)
+    sms_message = t('sms_payment_confirmed', code=ticket.code, estimated_time="15-20 minutes")
     send_sms(ticket.customer_phone, sms_message)
 
     return render_template('payment_success.html', ticket=ticket)
@@ -472,7 +475,7 @@ def complete_ticket(ticket_id):
     sharpener_name = session['sharpener_name']
     feedback_url = f"{BASE_URL}/feedback/{ticket.code}"
 
-    sms_message = t('sms_skates_ready', ticket.code, sharpener_name, ticket.brand, ticket.color, ticket.size, feedback_url)
+    sms_message = t('sms_ticket_completed', code=ticket.code, feedback_url=feedback_url)
     send_sms(ticket.customer_phone, sms_message)
 
     flash(t('ticket_completed', ticket.code))
@@ -504,7 +507,7 @@ def feedback(ticket_code):
         # Notify sharpener about feedback
         if ticket.sharpener:
             stars = '⭐' * rating
-            sms_message = t('sms_feedback_received', stars, ticket.customer_name, ticket.code, rating)
+            sms_message = t('feedback_email_body', name=ticket.customer_name, code=ticket.code, rating=rating)
 
             if comment:
                 sms_message += f"\n{t('comment')}: {comment}"
