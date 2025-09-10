@@ -10,7 +10,7 @@ Railway is the easiest platform for deploying this application with automatic HT
 
 1. **GitHub Account**: Ensure your code is pushed to GitHub
 2. **Railway Account**: Sign up at [railway.app](https://railway.app) using your GitHub account
-3. **GatewayAPI Account**: Sign up at [gatwayapi.eu](https://gatwayapi.eu) for SMS services
+3. **GatewayAPI Account**: Sign up at [gatewayapi.eu](https://gatewayapi.eu) for SMS services
 4. **Stripe Account**: Create account at [stripe.com](https://stripe.com) and enable MobilePay
 
 ### Step 2: Deploy to Railway
