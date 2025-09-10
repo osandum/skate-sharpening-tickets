@@ -11,6 +11,10 @@ import requests
 import os
 import yaml
 from functools import wraps
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
@@ -131,28 +135,52 @@ def generate_ticket_code():
     """Generate a 6-character ticket code"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+def normalize_phone_number(phone):
+    """Normalize Danish phone number to international format"""
+    # Remove all non-digit characters
+    phone_digits = ''.join(filter(str.isdigit, phone))
+
+    # Handle Danish mobile numbers
+    if phone_digits.startswith('45'):  # Already has country code
+        return phone_digits
+    elif len(phone_digits) == 8:  # Danish number without country code
+        return '45' + phone_digits
+    else:
+        return phone_digits  # Return as-is if unclear format
+
 def send_sms(phone, message):
     """Send SMS using GatewayAPI"""
     if not GATEWAYAPI_TOKEN or GATEWAYAPI_TOKEN == 'your-gatewayapi-token':
         # Simulation mode for development
-        print(f"SMS to {phone}: {message}")
+        print(f"[SMS SIMULATION] To: {phone}")
+        print(f"[SMS SIMULATION] Message: {message}")
+        print("-" * 50)
         return True
 
-    url = "https://gatwayapi.eu/rest/mtsms"
-    headers = {
-        "Authorization": f"Bearer {GATEWAYAPI_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    # Normalize phone number
+    msisdn = normalize_phone_number(phone)
+
     data = {
-        "sender": "SkateSharp",
-        "message": message,
-        "recipients": [{"msisdn": phone.replace("+", "").replace(" ", "")}]
+        "sender":     "SKK Ticket",         # Sender name (max 11 chars)
+        "message":    message,              # Message content
+        "encoding":   "UCS2",               # Use UCS2 for special characters
+        "recipients": [{"msisdn": msisdn}]  # Recipient list
     }
 
     try:
-        response = requests.post(url, json=data, headers=headers)
-        return response.status_code == 200
-    except:
+        print(f"[SMS] Sending to {msisdn}...")
+        response = requests.post("https://gatewayapi.eu/rest/mtsms", json=data, auth=(GATEWAYAPI_TOKEN, ''))
+
+        if response.status_code == 200:
+            print(f"[SMS] Successfully sent to {msisdn}")
+            return True
+        else:
+            print(f"[SMS] Failed to send. Status: {response.status_code}")
+            print(f"[SMS] Response: {response.text}")
+            return False
+
+    except Exception as e:
+        print(f"[SMS] Error sending SMS: {str(e)}")
         return False
 
 def create_stripe_payment_intent(amount, ticket):

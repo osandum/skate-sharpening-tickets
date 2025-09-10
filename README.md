@@ -287,7 +287,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Built with ❤️ for Nordic skating communities
-- SMS integration via [GatewayAPI](https://gatwayapi.eu/)
+- SMS integration via [GatewayAPI](https://gatewayapi.eu/)
 - Payment processing via [Stripe](https://stripe.com/)
 - UI styling with [Tailwind CSS](https://tailwindcss.com/)
 
