@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="w-full btn-primary text-lg">
+            <button type="submit" class="w-full btn-primary text-lg" id="submit-btn">
                 📱 {{ t('submit_button') }}
             </button>
         </form>
@@ -92,4 +92,36 @@
         </div>
     </div>
 </div>
+
+<script>
+{% if recaptcha_site_key %}
+// reCAPTCHA v3 integration
+document.getElementById('submit-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    var form = document.querySelector('form');
+    
+    // Check HTML5 form validity first
+    if (!form.checkValidity()) {
+        // Show validation messages by triggering native validation
+        form.reportValidity();
+        return;
+    }
+
+    grecaptcha.ready(function() {
+        grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'ticket_request'}).then(function(token) {
+            // Add the token to the form
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'g-recaptcha-response';
+            input.value = token;
+            form.appendChild(input);
+
+            // Submit the form
+            form.submit();
+        });
+    });
+});
+{% endif %}
+</script>
 {% endblock %}
