@@ -1,0 +1,68 @@
+<!-- templates/already_paid.html -->
+{% extends "base.html" %}
+{% block title %}{{ t('already_paid') }} - {{ ticket.code }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-2xl font-bold text-center mb-6 text-blue-700">
+            ℹ️ {{ t('already_paid') }}
+        </h1>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="text-center text-blue-800">
+                <div class="text-4xl mb-2">✅</div>
+                <p class="text-lg font-semibold">{{ t('ticket_already_paid_message') }}</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-2">{{ t('ticket_details') }}:</h3>
+            <div class="text-sm space-y-1">
+                <div><strong>{{ t('ticket_code') }}:</strong> {{ ticket.code }}</div>
+                <div><strong>{{ t('customer') }}:</strong> {{ ticket.customer_name }}</div>
+                <div><strong>{{ t('skates') }}:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
+                <div><strong>{{ t('amount') }}:</strong> 25 DKK</div>
+                <div><strong>{{ t('status') }}:</strong> 
+                    {% if ticket.status == 'paid' %}
+                        <span class="text-blue-600 font-semibold">{{ t('status_paid') }}</span>
+                    {% elif ticket.status == 'in_progress' %}
+                        <span class="text-orange-600 font-semibold">{{ t('status_in_progress') }}</span>
+                    {% elif ticket.status == 'completed' %}
+                        <span class="text-green-600 font-semibold">{{ t('status_completed') }}</span>
+                    {% endif %}
+                </div>
+                {% if ticket.paid_at %}
+                <div><strong>{{ t('paid_at') }}:</strong> {{ ticket.paid_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if ticket.status == 'paid' %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-green-800 mb-2">🔄 {{ t('current_status') }}:</h3>
+            <p class="text-sm text-green-700">{{ t('sharpening_will_begin_soon') }}</p>
+        </div>
+        {% elif ticket.status == 'in_progress' %}
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-orange-800 mb-2">⚡ {{ t('current_status') }}:</h3>
+            <p class="text-sm text-orange-700">{{ t('currently_being_sharpened') }}</p>
+        </div>
+        {% elif ticket.status == 'completed' %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-green-800 mb-2">🎉 {{ t('current_status') }}:</h3>
+            <p class="text-sm text-green-700">{{ t('skates_ready_for_pickup') }}</p>
+            {% if ticket.completed_at %}
+            <p class="text-xs text-green-600 mt-1">{{ t('completed_at') }}: {{ ticket.completed_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn-primary inline-block">
+                {{ t('return_home') }}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
