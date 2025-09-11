@@ -13,34 +13,6 @@ select_color: "Select color"
 select_size: "Select size"
 submit_button: "Send request 📱"
 
-# SMS messages
-sms_ticket_created: |
-  ✨ SKATE SHARPENING
-
-  Your ticket: {code}
-
-  Write the ticket code and your name on a piece of paper. Place it in the skates at drop-off.
-
-  Pay here: {payment_url}
-
-  Sharpening starts after payment.
-
-sms_payment_confirmed: |
-  ✅ PAYMENT CONFIRMED
-
-  Ticket: {code}
-  We're sharpening your skates now!
-
-  Expected ready: {estimated_time}
-
-sms_ticket_completed: |
-  🎉 SKATES READY!
-
-  Ticket: {code}
-  Your skates are sharp and ready for pickup!
-
-  How did we do? Leave feedback: {feedback_url}
-
 feedback_email_subject: "New skate sharpening feedback"
 
 feedback_email_body: |
@@ -182,7 +154,7 @@ pay_now: "Pay now"
 payment_description: "Skate sharpening"
 pay_with_mobilepay: "Pay with MobilePay"
 payment_success_title: "Payment completed!"
-payment_success_message: "Your payment has been received. Sharpening will begin now!"
+payment_success_message: "Your payment has been received and the shapening crew have been notified about your skates."
 return_home: "Return home"
 
 # Payment status pages
