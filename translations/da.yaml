@@ -13,34 +13,6 @@ select_color: "Vælg farve"
 select_size: "Vælg størrelse"
 submit_button: "Send anmodning 📱"
 
-# SMS messages
-sms_ticket_created: |
-  ✨ SKØJTESLIBNING
-
-  Din billet: {code}
-
-  Skriv billetkoden og dit navn på et stykke papir. Læg det i skøjterne ved indlevering.
-
-  Betal her: {payment_url}
-
-  Slibning starter efter betaling.
-
-sms_payment_confirmed: |
-  ✅ BETALING BEKRÆFTET
-
-  Billet: {code}
-  Vi sliberpå dine skøjter nu!
-
-  Forventet klar: {estimated_time}
-
-sms_ticket_completed: |
-  🎉 SKØJTER KLAR!
-
-  Billet: {code}
-  Dine skøjter er skarpe og klar til afhentning!
-
-  Hvordan gik det? Giv feedback: {feedback_url}
-
 feedback_email_subject: "Ny feedback fra skøjteslibning"
 
 feedback_email_body: |
@@ -171,7 +143,7 @@ pay_now: "Betal nu"
 payment_description: "Slibning af skøjter"
 pay_with_mobilepay: "Betal med MobilePay"
 payment_success_title: "Betaling gennemført!"
-payment_success_message: "Din betaling er modtaget. Slibning starter nu!"
+payment_success_message: "Din betaling er modtaget og slibeholdet har fået besked om dine skøjter."
 return_home: "Tilbage til forsiden"
 
 # Payment status pages

@@ -11,6 +11,7 @@ import requests
 import os
 import yaml
 from functools import wraps
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -82,20 +83,47 @@ class Feedback(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Internationalization
-def load_translations():
-    """Load translations from YAML files"""
-    translations = {}
-    for lang in ['da', 'en']:
-        try:
-            with open(f'translations/{lang}.yaml', 'r', encoding='utf-8') as f:
-                translations[lang] = yaml.safe_load(f)
-        except FileNotFoundError:
-            print(f"Warning: Translation file translations/{lang}.yaml not found")
-            translations[lang] = {}
-    return translations
+_translations_cache = {}
+_translation_file_times = {}
 
-# Load translations once at startup
-TRANSLATIONS = load_translations()
+def load_translations():
+    """Load translations from YAML files with hot-reloading in debug mode"""
+    global _translations_cache, _translation_file_times
+    
+    # In production, use cached translations
+    if not app.debug and _translations_cache:
+        return _translations_cache
+    
+    # Check if any translation files have been modified
+    reload_needed = False
+    for lang in ['da', 'en']:
+        file_path = f'translations/{lang}.yaml'
+        try:
+            current_mtime = Path(file_path).stat().st_mtime
+            if file_path not in _translation_file_times or _translation_file_times[file_path] != current_mtime:
+                _translation_file_times[file_path] = current_mtime
+                reload_needed = True
+        except FileNotFoundError:
+            continue
+    
+    # Reload translations if files changed or cache is empty
+    if reload_needed or not _translations_cache:
+        print("[Translations] Reloading language files...")
+        translations = {}
+        for lang in ['da', 'en']:
+            try:
+                with open(f'translations/{lang}.yaml', 'r', encoding='utf-8') as f:
+                    translations[lang] = yaml.safe_load(f)
+            except FileNotFoundError:
+                print(f"Warning: Translation file translations/{lang}.yaml not found")
+                translations[lang] = {}
+        _translations_cache = translations
+    
+    return _translations_cache
+
+def get_translations():
+    """Get current translations (with hot-reloading in debug mode)"""
+    return load_translations()
 
 def get_language():
     """Detect language from Accept-Language header"""
@@ -117,7 +145,8 @@ def get_language():
 def t(key, *args, **kwargs):
     """Translate key to current language"""
     lang = get_language()
-    translation = TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['en'].get(key, key))
+    translations = get_translations()
+    translation = translations.get(lang, {}).get(key, translations.get('en', {}).get(key, key))
 
     # Handle string formatting
     if args or kwargs:
@@ -126,9 +155,28 @@ def t(key, *args, **kwargs):
                 return translation.format(**kwargs)
             else:
                 return translation.format(*args)
-        except:
+        except Exception as e:
+            print(f"Warning: Translation formatting error for key '{key}': {e}")
             return translation
     return translation
+
+def render_sms_template(template_name, **context):
+    """Render SMS template with language detection"""
+    lang = get_language()
+    template_path = f"sms/{lang}/{template_name}.j2"
+    
+    try:
+        return render_template(template_path, **context)
+    except Exception as e:
+        print(f"Warning: SMS template error for {template_path}: {e}")
+        # Fallback to English if language-specific template fails
+        if lang != 'en':
+            try:
+                return render_template(f"sms/en/{template_name}.j2", **context)
+            except Exception as e2:
+                print(f"Error: English SMS template fallback failed: {e2}")
+                return f"SMS template error: {template_name}"
+        return f"SMS template error: {template_name}"
 
 @app.context_processor
 def inject_translate():
@@ -192,6 +240,11 @@ def send_sms(phone, message):
 
 def verify_recaptcha(response_token, min_score=0.5):
     """Verify reCAPTCHA v3 response with Google"""
+    # Skip reCAPTCHA verification in development mode (localhost)
+    if app.debug and (request.host.startswith('localhost') or request.host.startswith('127.0.0.1')):
+        print("[reCAPTCHA v3] Development mode - bypassing reCAPTCHA verification")
+        return True
+    
     if not RECAPTCHA_SECRET_KEY or RECAPTCHA_SECRET_KEY == '':
         # Skip verification in development if no key is set
         print("[reCAPTCHA v3] No secret key set, skipping verification")
@@ -347,9 +400,8 @@ def request_ticket():
 
     # Send SMS with payment link
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
-    skate_details = f"{brand} {color} {size}"
-
-    sms_message = t('sms_ticket_created', code=code, payment_url=payment_url)
+    
+    sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
     send_sms(phone, sms_message)
 
     flash(t('ticket_request_sent'))
@@ -377,7 +429,7 @@ def payment_success(ticket_code):
     db.session.commit()
 
     # Send confirmation SMS
-    sms_message = t('sms_payment_confirmed', code=ticket.code, estimated_time="15-20 minutes")
+    sms_message = render_sms_template('payment_confirmed', ticket=ticket, estimated_time="15-20 minutes")
     send_sms(ticket.customer_phone, sms_message)
 
     return render_template('payment_success.html', ticket=ticket)
@@ -477,7 +529,7 @@ def complete_ticket(ticket_id):
     sharpener_name = session['sharpener_name']
     feedback_url = f"{BASE_URL}/feedback/{ticket.code}"
 
-    sms_message = t('sms_ticket_completed', code=ticket.code, feedback_url=feedback_url)
+    sms_message = render_sms_template('ticket_completed', ticket=ticket, feedback_url=feedback_url)
     send_sms(ticket.customer_phone, sms_message)
 
     flash(t('ticket_completed', ticket.code))
