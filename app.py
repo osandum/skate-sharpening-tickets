@@ -137,8 +137,10 @@ def inject_translate():
 
 # Helper Functions
 def generate_ticket_code():
-    """Generate a 6-character ticket code"""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    """Generate a 5-character ticket code using unambiguous characters"""
+    # Exclude confusing characters: 0/O, 1/I/L, D (looks like 0)
+    chars = "ABCEFGHJKMNPQRSTUVWXYZ23456789"
+    return ''.join(random.choices(chars, k=5))
 
 def normalize_phone_number(phone):
     """Normalize Danish phone number to international format"""
