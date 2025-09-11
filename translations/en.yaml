@@ -146,6 +146,20 @@ payment_success_title: "Payment completed!"
 payment_success_message: "Your payment has been received and the shapening crew have been notified about your skates."
 return_home: "Return home"
 
+# Ticket creation confirmation
+ticket_created_title: "Ticket Created!"
+sms_sent_message: "SMS sent successfully!"
+sms_sent_to: "SMS sent to"
+next_steps: "Next steps"
+check_sms_step: "Check your SMS for the ticket code and payment link"
+write_code_step: "Write the ticket code and your name on paper, place in skates"
+pay_via_sms_step: "Pay using the link in the SMS (parents can pay too!)"
+pickup_notification_step: "You'll get an SMS when skates are ready for pickup"
+important_info: "Important information"
+request_details: "Request details"
+sent_via_sms: "Sent via SMS (check your phone)"
+session_expired: "Session expired. Please create a new ticket request."
+
 # Payment status pages
 what_happens_next: "What happens next"
 sharpening_will_begin: "Your skates will be sharpened shortly"
