@@ -404,8 +404,38 @@ def request_ticket():
     sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
     send_sms(phone, sms_message)
 
-    flash(t('ticket_request_sent'))
-    return redirect(url_for('index'))
+    # Store ticket info in session for confirmation page (without exposing ticket code in URL)
+    session['ticket_confirmation'] = {
+        'customer_name': ticket.customer_name,
+        'phone_number': ticket.customer_phone,
+        'skate_brand': ticket.brand,
+        'skate_color': ticket.color,
+        'skate_size': ticket.size,
+        'created': True
+    }
+
+    return redirect(url_for('ticket_created_confirmation'))
+
+@app.route('/ticket/created')
+def ticket_created_confirmation():
+    """Ticket creation confirmation page"""
+    # Get ticket info from session
+    ticket_info = session.get('ticket_confirmation')
+    
+    if not ticket_info or not ticket_info.get('created'):
+        # No valid session data, redirect to home
+        flash(t('session_expired'))
+        return redirect(url_for('index'))
+    
+    # Clear the session data after displaying (one-time use)
+    session.pop('ticket_confirmation', None)
+    
+    return render_template('ticket_created.html',
+                         customer_name=ticket_info['customer_name'],
+                         phone_number=ticket_info['phone_number'],
+                         skate_brand=ticket_info['skate_brand'],
+                         skate_color=ticket_info['skate_color'],
+                         skate_size=ticket_info['skate_size'])
 
 @app.route('/pay/<ticket_code>')
 def payment_page(ticket_code):

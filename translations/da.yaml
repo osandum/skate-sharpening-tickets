@@ -157,6 +157,20 @@ payment_success_title: "Betaling gennemført!"
 payment_success_message: "Din betaling er modtaget og slibeholdet har fået besked om dine skøjter."
 return_home: "Tilbage til forsiden"
 
+# Ticket creation confirmation
+ticket_created_title: "Billet oprettet!"
+sms_sent_message: "SMS sendt!"
+sms_sent_to: "SMS sendt til"
+next_steps: "Næste trin"
+check_sms_step: "Tjek din SMS for billetkode og betalingslink"
+write_code_step: "Skriv billetkoden og dit navn på papir, læg det i skøjterne"
+pay_via_sms_step: "Betal via linket i SMS'en (forældre kan også betale!)"
+pickup_notification_step: "Du får en SMS når skøjterne er klar til afhentning"
+important_info: "Vigtig information"
+request_details: "Anmodningsdetaljer"
+sent_via_sms: "Sendt via SMS (tjek din telefon)"
+session_expired: "Session udløbet. Opret venligst en ny billetanmodning."
+
 # Payment status pages
 what_happens_next: "Hvad sker der nu"
 sharpening_will_begin: "Dine skøjter bliver slebet kort"

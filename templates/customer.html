@@ -94,6 +94,40 @@
 </div>
 
 <script>
+// localStorage persistence for form fields
+document.addEventListener('DOMContentLoaded', function() {
+    const fields = ['phone', 'customer_name', 'brand', 'color', 'size'];
+    
+    // Check if localStorage is available
+    if (typeof(Storage) === "undefined") {
+        console.log("localStorage not supported");
+        return;
+    }
+    
+    // Load saved values from localStorage
+    fields.forEach(function(fieldName) {
+        const field = document.getElementById(fieldName);
+        const savedValue = localStorage.getItem('skate_form_' + fieldName);
+        if (field && savedValue) {
+            field.value = savedValue;
+            console.log('Restored ' + fieldName + ': ' + savedValue);
+        }
+    });
+    
+    // Save values to localStorage on input
+    fields.forEach(function(fieldName) {
+        const field = document.getElementById(fieldName);
+        if (field) {
+            field.addEventListener('input', function() {
+                localStorage.setItem('skate_form_' + fieldName, field.value);
+            });
+            field.addEventListener('change', function() {
+                localStorage.setItem('skate_form_' + fieldName, field.value);
+            });
+        }
+    });
+});
+
 {% if recaptcha_site_key %}
 // reCAPTCHA v3 integration
 document.getElementById('submit-btn').addEventListener('click', function(e) {
