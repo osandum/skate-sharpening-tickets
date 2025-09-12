@@ -1,18 +1,20 @@
-# Flask Skate Sharpening Ticket System
-# Complete backend with database, auth, SMS, and payment integration
+"""Flask Skate Sharpening Ticket System.
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, g
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+Complete backend with database, auth, SMS, and payment integration.
+"""
 from datetime import datetime
-import random
-import string
-import requests
-import os
-import yaml
 from functools import wraps
+import os
 from pathlib import Path
+import random
+
 from dotenv import load_dotenv
+from flask import (Flask, render_template, request, redirect, url_for,
+                   session, flash, send_from_directory, g)
+from flask_sqlalchemy import SQLAlchemy
+import requests
+from werkzeug.security import generate_password_hash, check_password_hash
+import yaml
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,7 +26,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Handle PostgreSQL URL format for SQLAlchemy 2.0+
 if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
-    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
+    )
 
 db = SQLAlchemy(app)
 
@@ -38,6 +42,7 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 
 # Database Models
 class Sharpener(db.Model):
+    """Database model for skate sharpener staff accounts."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
@@ -49,6 +54,7 @@ class Sharpener(db.Model):
     tickets = db.relationship('Ticket', backref='sharpener', lazy=True)
 
 class Ticket(db.Model):
+    """Database model for customer skate sharpening tickets."""
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), unique=True, nullable=False)
     customer_name = db.Column(db.String(100), nullable=False)
@@ -76,6 +82,7 @@ class Ticket(db.Model):
     feedback = db.relationship('Feedback', backref='ticket', uselist=False)
 
 class Feedback(db.Model):
+    """Database model for customer feedback on completed tickets."""
     id = db.Column(db.Integer, primary_key=True)
     ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
@@ -88,24 +95,25 @@ _translation_file_times = {}
 
 def load_translations():
     """Load translations from YAML files with hot-reloading in debug mode"""
-    global _translations_cache, _translation_file_times
-    
+    global _translations_cache
+
     # In production, use cached translations
     if not app.debug and _translations_cache:
         return _translations_cache
-    
+
     # Check if any translation files have been modified
     reload_needed = False
     for lang in ['da', 'en']:
         file_path = f'translations/{lang}.yaml'
         try:
             current_mtime = Path(file_path).stat().st_mtime
-            if file_path not in _translation_file_times or _translation_file_times[file_path] != current_mtime:
+            if (file_path not in _translation_file_times or
+                    _translation_file_times[file_path] != current_mtime):
                 _translation_file_times[file_path] = current_mtime
                 reload_needed = True
         except FileNotFoundError:
             continue
-    
+
     # Reload translations if files changed or cache is empty
     if reload_needed or not _translations_cache:
         print("[Translations] Reloading language files...")
@@ -118,7 +126,7 @@ def load_translations():
                 print(f"Warning: Translation file translations/{lang}.yaml not found")
                 translations[lang] = {}
         _translations_cache = translations
-    
+
     return _translations_cache
 
 def get_translations():
@@ -164,7 +172,7 @@ def render_sms_template(template_name, **context):
     """Render SMS template with language detection"""
     lang = get_language()
     template_path = f"sms/{lang}/{template_name}.j2"
-    
+
     try:
         return render_template(template_path, **context)
     except Exception as e:
@@ -181,7 +189,7 @@ def render_sms_template(template_name, **context):
 @app.context_processor
 def inject_translate():
     """Make translation function available in all templates"""
-    return dict(t=t, recaptcha_site_key=RECAPTCHA_SITE_KEY)
+    return {'t': t, 'recaptcha_site_key': RECAPTCHA_SITE_KEY}
 
 # Helper Functions
 def generate_ticket_code():
@@ -224,7 +232,12 @@ def send_sms(phone, message):
 
     try:
         print(f"[SMS] Sending to {msisdn}...")
-        response = requests.post("https://gatewayapi.eu/rest/mtsms", json=data, auth=(GATEWAYAPI_TOKEN, ''))
+        response = requests.post(
+            "https://gatewayapi.eu/rest/mtsms",
+            json=data,
+            auth=(GATEWAYAPI_TOKEN, ''),
+            timeout=30
+        )
 
         if response.status_code == 200:
             print(f"[SMS] Successfully sent to {msisdn}")
@@ -244,7 +257,7 @@ def verify_recaptcha(response_token, min_score=0.5):
     if app.debug and (request.host.startswith('localhost') or request.host.startswith('127.0.0.1')):
         print("[reCAPTCHA v3] Development mode - bypassing reCAPTCHA verification")
         return True
-    
+
     if not RECAPTCHA_SECRET_KEY or RECAPTCHA_SECRET_KEY == '':
         # Skip verification in development if no key is set
         print("[reCAPTCHA v3] No secret key set, skipping verification")
@@ -263,7 +276,8 @@ def verify_recaptcha(response_token, min_score=0.5):
 
         response = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
-            data=verification_data
+            data=verification_data,
+            timeout=10
         )
 
         result = response.json()
@@ -347,12 +361,12 @@ def request_ticket():
         brand = request.form.get('brand', '')
         color = request.form.get('color', '')
         size_str = request.form.get('size', '')
-        
+
         # Validate all required fields
         if not name or not phone or not brand or not color or not size_str:
             flash(t('all_fields_required'))
             return redirect(url_for('index'))
-        
+
         # Validate size is a valid integer
         try:
             size = int(size_str)
@@ -362,7 +376,7 @@ def request_ticket():
         except ValueError:
             flash(t('invalid_size'))
             return redirect(url_for('index'))
-            
+
     except Exception as e:
         print(f"[ERROR] Form validation error: {str(e)}")
         flash(t('form_error'))
@@ -400,7 +414,7 @@ def request_ticket():
 
     # Send SMS with payment link
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
-    
+
     sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
     send_sms(phone, sms_message)
 
@@ -421,15 +435,15 @@ def ticket_created_confirmation():
     """Ticket creation confirmation page"""
     # Get ticket info from session
     ticket_info = session.get('ticket_confirmation')
-    
+
     if not ticket_info or not ticket_info.get('created'):
         # No valid session data, redirect to home
         flash(t('session_expired'))
         return redirect(url_for('index'))
-    
+
     # Clear the session data after displaying (one-time use)
     session.pop('ticket_confirmation', None)
-    
+
     return render_template('ticket_created.html',
                          customer_name=ticket_info['customer_name'],
                          phone_number=ticket_info['phone_number'],
@@ -459,7 +473,11 @@ def payment_success(ticket_code):
     db.session.commit()
 
     # Send confirmation SMS
-    sms_message = render_sms_template('payment_confirmed', ticket=ticket, estimated_time="15-20 minutes")
+    sms_message = render_sms_template(
+        'payment_confirmed',
+        ticket=ticket,
+        estimated_time="15-20 minutes"
+    )
     send_sms(ticket.customer_phone, sms_message)
 
     return render_template('payment_success.html', ticket=ticket)
@@ -556,7 +574,6 @@ def complete_ticket(ticket_id):
     db.session.commit()
 
     # Send pickup SMS with feedback link
-    sharpener_name = session['sharpener_name']
     feedback_url = f"{BASE_URL}/feedback/{ticket.code}"
 
     sms_message = render_sms_template('ticket_completed', ticket=ticket, feedback_url=feedback_url)
@@ -590,8 +607,12 @@ def feedback(ticket_code):
 
         # Notify sharpener about feedback
         if ticket.sharpener:
-            stars = '⭐' * rating
-            sms_message = t('feedback_email_body', name=ticket.customer_name, code=ticket.code, rating=rating)
+            sms_message = t(
+                'feedback_email_body',
+                name=ticket.customer_name,
+                code=ticket.code,
+                rating=rating
+            )
 
             if comment:
                 sms_message += f"\n{t('comment')}: {comment}"
@@ -631,6 +652,7 @@ def create_sharpener():
 
 # Initialize database
 def create_tables():
+    """Create database tables if they don't exist."""
     with app.app_context():
         db.create_all()
 
