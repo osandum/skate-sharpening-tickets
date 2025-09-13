@@ -28,13 +28,15 @@
 
         <!-- In real implementation, integrate Stripe Elements here -->
         <div class="space-y-4">
-            <button onclick="simulatePayment()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
-                📱 {{ t('pay_now') }} (25 DKK)
-            </button>
+            <form method="POST" action="{{ url_for('payment_process', ticket_code=ticket.code) }}" id="payment-form">
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
+                    📱 {{ t('pay_now') }} (25 DKK)
+                </button>
+            </form>
 
             <div class="text-center">
                 <a href="{{ url_for('payment_success', ticket_code=ticket.code) }}" class="text-sm text-blue-600 hover:text-blue-800">
-                    [Demo: Skip to payment success]
+                    [Demo: View payment status]
                 </a>
             </div>
         </div>
@@ -47,9 +49,7 @@
 </div>
 
 <script>
-function simulatePayment() {
-    alert('In real implementation: Stripe MobilePay flow would happen here');
-    window.location.href = "{{ url_for('payment_success', ticket_code=ticket.code) }}";
-}
+// In real implementation, Stripe payment handling would be here
+// The form will POST to process the payment and send SMS
 </script>
 {% endblock %}
