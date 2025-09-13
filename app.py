@@ -461,25 +461,34 @@ def payment_page(ticket_code):
 
     return render_template('payment.html', ticket=ticket, stripe_key=STRIPE_PUBLISHABLE_KEY)
 
-@app.route('/payment_success/<ticket_code>')
-def payment_success(ticket_code):
-    """Handle successful payment"""
+@app.route('/payment_process/<ticket_code>', methods=['POST'])
+def payment_process(ticket_code):
+    """Process payment confirmation (should be called by payment provider webhook)"""
     ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
 
-    # In real implementation, verify payment with Stripe webhook
-    # For now, simulate successful payment
-    ticket.status = 'paid'
-    ticket.paid_at = datetime.utcnow()
-    db.session.commit()
+    # Only process payment if ticket is still unpaid
+    if ticket.status == 'unpaid':
+        # In real implementation, verify payment with Stripe webhook
+        # For now, simulate successful payment
+        ticket.status = 'paid'
+        ticket.paid_at = datetime.utcnow()
+        db.session.commit()
 
-    # Send confirmation SMS
-    sms_message = render_sms_template(
-        'payment_confirmed',
-        ticket=ticket,
-        estimated_time="15-20 minutes"
-    )
-    send_sms(ticket.customer_phone, sms_message)
+        # Send confirmation SMS only on first payment
+        sms_message = render_sms_template(
+            'payment_confirmed',
+            ticket=ticket,
+            estimated_time="15-20 minutes"
+        )
+        send_sms(ticket.customer_phone, sms_message)
 
+    # Redirect to success page after processing
+    return redirect(url_for('payment_success', ticket_code=ticket_code))
+
+@app.route('/payment_success/<ticket_code>')
+def payment_success(ticket_code):
+    """Display payment success page (no side effects, just shows status)"""
+    ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
     return render_template('payment_success.html', ticket=ticket)
 
 @app.route('/sharpener/login', methods=['GET', 'POST'])
