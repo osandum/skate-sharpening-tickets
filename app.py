@@ -13,6 +13,7 @@ from flask import (Flask, render_template, request, redirect, url_for,
                    session, flash, send_from_directory, g)
 from flask_sqlalchemy import SQLAlchemy
 import requests
+import stripe
 from werkzeug.security import generate_password_hash, check_password_hash
 import yaml
 
@@ -32,10 +33,14 @@ if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
 
 db = SQLAlchemy(app)
 
+# Configure Stripe
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
+
 # Configuration - set these as environment variables
 GATEWAYAPI_TOKEN = os.environ.get('GATEWAYAPI_TOKEN', 'your-gatewayapi-token')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'your-stripe-publishable-key')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'your-stripe-webhook-secret')
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
@@ -302,16 +307,38 @@ def verify_recaptcha(response_token, min_score=0.5):
 
 def create_stripe_payment_intent(amount, ticket):
     """Create Stripe payment intent for MobilePay"""
-    # This is a stub - implement actual Stripe integration
-    # In real implementation, create payment intent with MobilePay payment method
-
     if not STRIPE_SECRET_KEY or STRIPE_SECRET_KEY == 'your-stripe-secret-key':
         # Simulation mode
+        print(f"[Stripe] Simulation mode - creating fake payment intent for ticket {ticket.code}")
         return f"pi_simulation_{ticket.code}"
 
-    # Real Stripe integration would go here
-    # stripe.PaymentIntent.create(...)
-    return "pi_simulation_" + ticket.code
+    try:
+        # Create real Stripe payment intent
+        print(f"[Stripe] Creating payment intent for ticket {ticket.code}, amount: {amount} DKK")
+
+        # Convert DKK to øre (smallest currency unit)
+        amount_in_ore = int(amount * 100)
+
+        payment_intent = stripe.PaymentIntent.create(
+            amount=amount_in_ore,
+            currency='dkk',
+            payment_method_types=['mobilepay'],  # Can add 'mobilepay' when available in Denmark
+            metadata={
+                'ticket_code': ticket.code,
+                'customer_name': ticket.customer_name,
+                'customer_phone': ticket.customer_phone,
+                'skate_details': f"{ticket.brand} {ticket.color} {ticket.size}"
+            },
+            description=f"Skate sharpening - Ticket {ticket.code}"
+        )
+
+        print(f"[Stripe] Payment intent created: {payment_intent.id}")
+        return payment_intent.id
+
+    except Exception as e:
+        print(f"[Stripe] Error creating payment intent: {e}")
+        # Fallback to simulation mode on error
+        return f"pi_simulation_{ticket.code}"
 
 def login_required(f):
     """Decorator to require sharpener login"""
@@ -408,7 +435,7 @@ def request_ticket():
     db.session.commit()
 
     # Create payment intent
-    payment_id = create_stripe_payment_intent(25, ticket)  # 25 DKK
+    payment_id = create_stripe_payment_intent(35, ticket)  # 25 DKK
     ticket.payment_id = payment_id
     db.session.commit()
 
@@ -459,7 +486,20 @@ def payment_page(ticket_code):
     if ticket.status != 'unpaid':
         return render_template('already_paid.html', ticket=ticket)
 
-    return render_template('payment.html', ticket=ticket, stripe_key=STRIPE_PUBLISHABLE_KEY)
+    # Get client_secret for Stripe payment
+    client_secret = None
+    if ticket.payment_id and not ticket.payment_id.startswith('pi_simulation_'):
+        try:
+            # Retrieve the payment intent to get client_secret
+            payment_intent = stripe.PaymentIntent.retrieve(ticket.payment_id)
+            client_secret = payment_intent.client_secret
+        except Exception as e:
+            print(f"[Stripe] Error retrieving payment intent: {e}")
+
+    return render_template('payment.html',
+                         ticket=ticket,
+                         stripe_key=STRIPE_PUBLISHABLE_KEY,
+                         client_secret=client_secret)
 
 @app.route('/payment_process/<ticket_code>', methods=['POST'])
 def payment_process(ticket_code):
@@ -482,14 +522,127 @@ def payment_process(ticket_code):
         )
         send_sms(ticket.customer_phone, sms_message)
 
-    # Redirect to success page after processing
-    return redirect(url_for('payment_success', ticket_code=ticket_code))
+    # Redirect to return page after processing
+    return redirect(url_for('payment_return', ticket_code=ticket_code))
 
-@app.route('/payment_success/<ticket_code>')
-def payment_success(ticket_code):
-    """Display payment success page (no side effects, just shows status)"""
+@app.route('/payment_return/<ticket_code>')
+def payment_return(ticket_code):
+    """Handle payment return - displays success or failure based on payment status"""
     ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
-    return render_template('payment_success.html', ticket=ticket)
+
+    # Check payment status from query parameters (Stripe typically adds payment_intent parameters)
+    payment_intent = request.args.get('payment_intent')
+    payment_intent_client_secret = request.args.get('payment_intent_client_secret')
+    redirect_status = request.args.get('redirect_status')
+
+    # Determine if payment was successful
+    payment_successful = False
+    error_message = None
+
+    if redirect_status == 'succeeded' or ticket.status == 'paid':
+        payment_successful = True
+    elif redirect_status == 'failed':
+        error_message = t('payment_failed')
+    elif redirect_status == 'canceled':
+        error_message = t('payment_canceled')
+    else:
+        # If no clear status, check with Stripe API if we have payment_intent
+        if payment_intent and STRIPE_SECRET_KEY != 'your-stripe-secret-key':
+            try:
+                intent = stripe.PaymentIntent.retrieve(payment_intent)
+                if intent.status == 'succeeded':
+                    payment_successful = True
+                elif intent.status == 'canceled':
+                    error_message = t('payment_canceled')
+                else:
+                    error_message = t('payment_failed')
+            except Exception as e:
+                print(f"[Payment Return] Error checking payment status: {e}")
+                error_message = t('payment_status_unknown')
+
+    if payment_successful:
+        return render_template('payment_success.html', ticket=ticket)
+    else:
+        return render_template('payment_failed.html',
+                             ticket=ticket,
+                             error_message=error_message,
+                             payment_url=url_for('payment_page', ticket_code=ticket_code))
+
+@app.route('/stripe/webhook', methods=['POST'])
+def stripe_webhook():
+    """Handle Stripe payment webhooks"""
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers.get('Stripe-Signature')
+
+    # Skip webhook verification in development if secret not configured
+    if STRIPE_WEBHOOK_SECRET == 'your-stripe-webhook-secret':
+        print("[Stripe Webhook] Development mode - skipping signature verification")
+        try:
+            event = stripe.Event.construct_from(request.get_json(), stripe.api_key)
+        except Exception as e:
+            print(f"[Stripe Webhook] Error parsing webhook: {e}")
+            return 'Invalid payload', 400
+    else:
+        # Verify webhook signature in production
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, STRIPE_WEBHOOK_SECRET
+            )
+        except ValueError:
+            print("[Stripe Webhook] Invalid payload")
+            return 'Invalid payload', 400
+        except stripe.error.SignatureVerificationError:
+            print("[Stripe Webhook] Invalid signature")
+            return 'Invalid signature', 400
+
+    # Handle payment success event
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+
+        # Get ticket code from payment metadata
+        ticket_code = payment_intent.get('metadata', {}).get('ticket_code')
+        if not ticket_code:
+            print("[Stripe Webhook] No ticket_code in payment metadata")
+            return 'Missing ticket_code', 400
+
+        # Find and update ticket
+        ticket = Ticket.query.filter_by(code=ticket_code).first()
+        if not ticket:
+            print(f"[Stripe Webhook] Ticket not found: {ticket_code}")
+            return 'Ticket not found', 404
+
+        # Only process if still unpaid (prevent duplicate processing)
+        if ticket.status == 'unpaid':
+            print(f"[Stripe Webhook] Processing payment for ticket {ticket_code}")
+
+            # Update ticket status
+            ticket.status = 'paid'
+            ticket.paid_at = datetime.utcnow()
+            ticket.payment_id = payment_intent['id']
+            db.session.commit()
+
+            # Send confirmation SMS
+            sms_message = render_sms_template(
+                'payment_confirmed',
+                ticket=ticket,
+                estimated_time="15-20 minutes"
+            )
+            send_sms(ticket.customer_phone, sms_message)
+
+            print(f"[Stripe Webhook] Payment processed and SMS sent for ticket {ticket_code}")
+        else:
+            print(f"[Stripe Webhook] Ticket {ticket_code} already processed (status: {ticket.status})")
+
+    elif event['type'] == 'payment_intent.payment_failed':
+        payment_intent = event['data']['object']
+        ticket_code = payment_intent.get('metadata', {}).get('ticket_code')
+        print(f"[Stripe Webhook] Payment failed for ticket {ticket_code}")
+        # Could add failed payment handling here if needed
+
+    else:
+        print(f"[Stripe Webhook] Unhandled event type: {event['type']}")
+
+    return '', 200
 
 @app.route('/sharpener/login', methods=['GET', 'POST'])
 def sharpener_login():

@@ -26,11 +26,36 @@
             </p>
         </div>
 
-        <!-- In real implementation, integrate Stripe Elements here -->
+        {% if client_secret %}
+        <!-- Real Stripe Payment -->
+        <div id="stripe-payment">
+            <form id="payment-form">
+                <div id="payment-element" class="p-3 border border-gray-300 rounded-lg mb-4">
+                    <!-- Stripe Elements will create form elements here -->
+                </div>
+                <div id="payment-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
+                <button type="submit" id="submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="button-text">💳 {{ t('pay_now') }} (25 DKK)</span>
+                    <div class="spinner hidden" id="spinner"></div>
+                </button>
+    {#
+                <div id="card-element" class="p-3 border border-gray-300 rounded-lg mb-4">
+                    <!-- Stripe Elements will create form elements here -->
+                </div>
+                <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
+                <button type="submit" id="submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="button-text">💳 {{ t('pay_now') }} (25 DKK)</span>
+                    <div class="spinner hidden" id="spinner"></div>
+                </button>
+    #}
+            </form>
+        </div>
+        {% else %}
+        <!-- Simulation Mode -->
         <div class="space-y-4">
             <form method="POST" action="{{ url_for('payment_process', ticket_code=ticket.code) }}" id="payment-form">
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
-                    📱 {{ t('pay_now') }} (25 DKK)
+                    📱 {{ t('pay_now') }} (25 DKK) - [SIMULATION]
                 </button>
             </form>
 
@@ -40,6 +65,7 @@
                 </a>
             </div>
         </div>
+        {% endif %}
 
         <div class="mt-6 text-xs text-gray-500 text-center">
             <p>⚠️ Your skates will only be sharpened after payment</p>
@@ -48,8 +74,80 @@
     </div>
 </div>
 
+{% if client_secret %}
+<!-- Stripe.js for real payments -->
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-// In real implementation, Stripe payment handling would be here
-// The form will POST to process the payment and send SMS
+// Initialize Stripe
+const stripe = Stripe('{{ stripe_key }}');
+
+async function initPayment() {
+    const elements = stripe.elements({ clientSecret: '{{ client_secret }}' });
+
+    // Create MobilePay payment element
+    const paymentElement = elements.create("payment");
+    paymentElement.mount("#payment-element");
+
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.getElementById('spinner');
+
+        // Disable button and show spinner
+        submitButton.disabled = true;
+        buttonText.classList.add('hidden');
+        spinner.classList.remove('hidden');
+
+        // Confirm payment
+        const res = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: "{{ url_for('payment_return', ticket_code=ticket.code, _external=True) }}",
+          },
+        });
+
+        if (res.error) {
+            // Show error to customer
+            const errorElement = document.getElementById('payment-errors');
+            errorElement.textContent = res.error.message;
+
+            // Re-enable button
+            submitButton.disabled = false;
+            buttonText.classList.remove('hidden');
+            spinner.classList.add('hidden');
+        } else {
+            // Payment succeeded, redirect to return page
+            window.location.href = "{{ url_for('payment_return', ticket_code=ticket.code) }}";
+        }
+    });
+}
+
+initPayment();
 </script>
+
+<style>
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+{% else %}
+<!-- Simulation mode script -->
+<script>
+// Simulation mode - form will POST to process the payment
+</script>
+{% endif %}
 {% endblock %}
