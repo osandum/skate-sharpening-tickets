@@ -519,8 +519,7 @@ def payment_process(ticket_code):
         if SEND_PAYMENT_CONFIRMATION_SMS:
             sms_message = render_sms_template(
                 'payment_confirmed',
-                ticket=ticket,
-                estimated_time="15-20 minutes"
+                ticket=ticket
             )
             send_sms(ticket.customer_phone, sms_message)
 
