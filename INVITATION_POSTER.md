@@ -7,7 +7,7 @@
 1. **Fill in your details** - Enter your name, phone number, and skate details (brand, color, size)
 2. **Get SMS with ticket code** - You'll receive a text with your unique ticket code and payment link
 3. **Write ticket slip** - Write your ticket code and name on paper, place inside one of your skates
-4. **Pay via SMS link** - Click the payment link in your SMS to pay 80 DKK via MobilePay
+4. **Pay via SMS link** - Click the payment link in your SMS to pay via MobilePay
 5. **Get pickup notification** - We'll text you when your skates are ready for pickup
 
 ---
@@ -25,7 +25,7 @@
 - **Payment is required** before sharpening begins
 - You'll receive SMS updates throughout the process
 
-### 💰 Price: 80 DKK per pair
+### 💰 Price: See website for current pricing
 *Payment via MobilePay through secure SMS link*
 
 ---
