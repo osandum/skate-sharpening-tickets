@@ -37,6 +37,11 @@ Railway is the easiest platform for deploying this application with automatic HT
    # Payment Processing
    STRIPE_SECRET_KEY=sk_live_your-stripe-secret-key
    STRIPE_PUBLISHABLE_KEY=pk_live_your-stripe-publishable-key
+   STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
+
+   # Optional: Google reCAPTCHA (recommended for production)
+   RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+   RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
    ```
 
 4. **Deploy**:
