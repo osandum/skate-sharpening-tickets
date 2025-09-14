@@ -38,6 +38,7 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
 
 # Configuration - set these as environment variables
 GATEWAYAPI_TOKEN = os.environ.get('GATEWAYAPI_TOKEN', 'your-gatewayapi-token')
+SEND_PAYMENT_CONFIRMATION_SMS = os.environ.get('SEND_PAYMENT_CONFIRMATION_SMS', 'false').lower() == 'true'
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'your-stripe-publishable-key')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'your-stripe-webhook-secret')
@@ -514,13 +515,14 @@ def payment_process(ticket_code):
         ticket.paid_at = datetime.utcnow()
         db.session.commit()
 
-        # Send confirmation SMS only on first payment
-        sms_message = render_sms_template(
-            'payment_confirmed',
-            ticket=ticket,
-            estimated_time="15-20 minutes"
-        )
-        send_sms(ticket.customer_phone, sms_message)
+        # Send confirmation SMS only if configured
+        if SEND_PAYMENT_CONFIRMATION_SMS:
+            sms_message = render_sms_template(
+                'payment_confirmed',
+                ticket=ticket,
+                estimated_time="15-20 minutes"
+            )
+            send_sms(ticket.customer_phone, sms_message)
 
     # Redirect to return page after processing
     return redirect(url_for('payment_return', ticket_code=ticket_code))
@@ -621,15 +623,17 @@ def stripe_webhook():
             ticket.payment_id = payment_intent['id']
             db.session.commit()
 
-            # Send confirmation SMS
-            sms_message = render_sms_template(
-                'payment_confirmed',
-                ticket=ticket,
-                estimated_time="15-20 minutes"
-            )
-            send_sms(ticket.customer_phone, sms_message)
-
-            print(f"[Stripe Webhook] Payment processed and SMS sent for ticket {ticket_code}")
+            # Send confirmation SMS only if configured
+            if SEND_PAYMENT_CONFIRMATION_SMS:
+                sms_message = render_sms_template(
+                    'payment_confirmed',
+                    ticket=ticket,
+                    estimated_time="15-20 minutes"
+                )
+                send_sms(ticket.customer_phone, sms_message)
+                print(f"[Stripe Webhook] Payment processed and SMS sent for ticket {ticket_code}")
+            else:
+                print(f"[Stripe Webhook] Payment processed for ticket {ticket_code} (SMS disabled)")
         else:
             print(f"[Stripe Webhook] Ticket {ticket_code} already processed (status: {ticket.status})")
 
