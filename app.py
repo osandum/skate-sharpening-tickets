@@ -45,6 +45,7 @@ STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'your-stripe-web
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
+SHARPENING_PRICE_DKK = int(os.environ.get('SHARPENING_PRICE_DKK', '80'))
 
 # Database Models
 class Sharpener(db.Model):
@@ -195,7 +196,7 @@ def render_sms_template(template_name, **context):
 @app.context_processor
 def inject_translate():
     """Make translation function available in all templates"""
-    return {'t': t, 'recaptcha_site_key': RECAPTCHA_SITE_KEY}
+    return {'t': t, 'recaptcha_site_key': RECAPTCHA_SITE_KEY, 'sharpening_price': SHARPENING_PRICE_DKK}
 
 # Helper Functions
 def generate_ticket_code():
@@ -436,7 +437,7 @@ def request_ticket():
     db.session.commit()
 
     # Create payment intent
-    payment_id = create_stripe_payment_intent(35, ticket)  # 25 DKK
+    payment_id = create_stripe_payment_intent(SHARPENING_PRICE_DKK, ticket)
     ticket.payment_id = payment_id
     db.session.commit()
 

@@ -15,7 +15,7 @@
                 <div><strong>{{ t('ticket_code') }}:</strong> {{ ticket.code }}</div>
                 <div><strong>{{ t('customer') }}:</strong> {{ ticket.customer_name }}</div>
                 <div><strong>{{ t('skates') }}:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
-                <div><strong>{{ t('amount') }}:</strong> 25 DKK</div>
+                <div><strong>{{ t('amount') }}:</strong> {{ sharpening_price }} DKK</div>
             </div>
         </div>
 
@@ -35,7 +35,7 @@
                 </div>
                 <div id="payment-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
                 <button type="submit" id="submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="button-text">💳 {{ t('pay_now') }} (25 DKK)</span>
+                    <span id="button-text">💳 {{ t('pay_now') }} ({{ sharpening_price }} DKK)</span>
                     <div class="spinner hidden" id="spinner"></div>
                 </button>
     {#
@@ -44,7 +44,7 @@
                 </div>
                 <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
                 <button type="submit" id="submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="button-text">💳 {{ t('pay_now') }} (25 DKK)</span>
+                    <span id="button-text">💳 {{ t('pay_now') }} ({{ sharpening_price }} DKK)</span>
                     <div class="spinner hidden" id="spinner"></div>
                 </button>
     #}
@@ -55,7 +55,7 @@
         <div class="space-y-4">
             <form method="POST" action="{{ url_for('payment_process', ticket_code=ticket.code) }}" id="payment-form">
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
-                    📱 {{ t('pay_now') }} (25 DKK) - [SIMULATION]
+                    📱 {{ t('pay_now') }} ({{ sharpening_price }} DKK) - [SIMULATION]
                 </button>
             </form>
 
