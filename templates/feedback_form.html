@@ -10,12 +10,12 @@
         </h1>
 
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <h3 class="font-semibold text-green-800 mb-2">Your Sharpening:</h3>
+            <h3 class="font-semibold text-green-800 mb-2">{{ t('your_sharpening') }}:</h3>
             <div class="text-sm space-y-1">
                 <div><strong>{{ t('ticket_code') }}:</strong> {{ ticket.code }}</div>
                 <div><strong>{{ t('skates') }}:</strong> {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
-                <div><strong>Sharpened by:</strong> {{ ticket.sharpener.name if ticket.sharpener else 'Unknown' }}</div>
-                <div><strong>Completed:</strong> {{ ticket.completed_at.strftime('%d/%m %H:%M') if ticket.completed_at else 'Unknown' }}</div>
+                <div><strong>{{ t('sharpened_by') }}:</strong> {{ ticket.sharpener.name if ticket.sharpener else t('unknown') }}</div>
+                <div><strong>{{ t('completed_at') }}:</strong> {{ ticket.completed_at.strftime('%d/%m %H:%M') if ticket.completed_at else t('unknown') }}</div>
             </div>
         </div>
 
@@ -33,7 +33,7 @@
                     {% endfor %}
                 </div>
                 <div class="text-center text-sm text-gray-500 mt-2">
-                    <span id="rating-text">Click to rate</span>
+                    <span id="rating-text">{{ t('click_to_rate') }}</span>
                 </div>
             </div>
 
@@ -43,7 +43,7 @@
                 </label>
                 <textarea name="comment" rows="3"
                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="Any comments for the sharpener?"></textarea>
+                          placeholder="{{ t('comment_placeholder_sharpener') }}"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
@@ -56,7 +56,7 @@
 <script>
 const stars = document.querySelectorAll('.star');
 const ratingText = document.getElementById('rating-text');
-const ratings = ['', 'Poor 😞', 'Fair 😐', 'Good 🙂', 'Great 😊', 'Excellent! 🤩'];
+const ratings = ['', 'Dårlig 😞', 'OK 😐', 'God 🙂', 'Rigtig god 😊', 'Fremragende! 🤩'];
 
 stars.forEach((star, index) => {
     star.addEventListener('click', () => {
@@ -93,7 +93,7 @@ document.querySelector('form').addEventListener('mouseleave', () => {
         ratingText.textContent = ratings[rating];
     } else {
         stars.forEach(s => s.style.color = '#d1d5db');
-        ratingText.textContent = 'Click to rate';
+        ratingText.textContent = 'Klik for at bedømme';
     }
 });
 </script>
