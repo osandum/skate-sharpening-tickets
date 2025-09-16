@@ -1,0 +1,65 @@
+<!-- templates/accept_invitation.html -->
+{% extends "base.html" %}
+{% block title %}Complete Registration{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="card-wrapper">
+        <h1 class="text-2xl font-bold text-center mb-8 text-gray-800">
+            ✂️ Complete Your Registration
+        </h1>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p class="text-green-800 text-sm">
+                You've been invited to join as a sharpener for <strong>{{ email }}</strong>.
+                Please complete your registration below.
+            </p>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                <input type="text" name="name" required
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       placeholder="Your full name">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                <input type="tel" name="phone" required
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       placeholder="+45 12 34 56 78">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                <input type="text" name="username" required
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       placeholder="Choose a username">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" value="{{ email }}" readonly
+                       class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100">
+                <p class="text-sm text-gray-600 mt-1">This email address was used for your invitation.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                <input type="password" name="password" required
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                       placeholder="Create a secure password">
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
+                Complete Registration
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-600">
+            <p>After registration, you can login at <a href="{{ url_for('sharpener_login') }}" class="text-green-600 hover:text-green-800">the sharpener login page</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
