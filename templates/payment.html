@@ -30,12 +30,14 @@
         <!-- Real Stripe Payment -->
         <div id="stripe-payment">
             <form id="payment-form">
+    {#
                 <div id="payment-element" class="p-3 border border-gray-300 rounded-lg mb-4">
                     <!-- Stripe Elements will create form elements here -->
                 </div>
+    #}
                 <div id="payment-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
-                <button type="submit" id="submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="button-text">💳 {{ t('pay_now') }} ({{ sharpening_price }} DKK)</span>
+                <button type="submit" id="submit-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="button-text">{{ t('pay_now') }} ({{ sharpening_price }} DKK) →</span>
                     <div class="spinner hidden" id="spinner"></div>
                 </button>
     {#
@@ -84,9 +86,11 @@ const stripe = Stripe('{{ stripe_key }}');
 async function initPayment() {
     const elements = stripe.elements({ clientSecret: '{{ client_secret }}' });
 
+/*
     // Create MobilePay payment element
     const paymentElement = elements.create("payment");
     paymentElement.mount("#payment-element");
+ */
 
     // Handle form submission
     const form = document.getElementById('payment-form');
@@ -104,7 +108,7 @@ async function initPayment() {
 
         // Confirm payment
         const res = await stripe.confirmPayment({
-          elements,
+          clientSecret: '{{ client_secret }}',
           confirmParams: {
             return_url: "{{ url_for('payment_return', ticket_code=ticket.code, _external=True) }}",
           },
