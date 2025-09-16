@@ -24,7 +24,9 @@ A bilingual Flask web application for managing ice skate sharpening services wit
 - **SMS integration** via GatewayAPI
 - **Payment processing** via Stripe + MobilePay
 - **Docker containerization** for production deployment
-- **Responsive design** with Tailwind CSS
+- **Responsive mobile-first design** with Tailwind CSS
+- **reCAPTCHA v3** for bot protection
+- **Borderless cards on mobile** for cleaner UX
 
 ## 🚀 Quick Start
 
@@ -99,6 +101,10 @@ SECRET_KEY=your-very-secret-key-32-characters-minimum
 
 # Optional: Database (defaults to SQLite)
 DATABASE_URL=sqlite:///skate_tickets.db
+
+# Optional: reCAPTCHA for bot protection
+RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 ```
 
 ### First-Time Setup
@@ -106,14 +112,20 @@ DATABASE_URL=sqlite:///skate_tickets.db
 1. **Create Sharpener Accounts**:
    - Visit `/admin/create_sharpener`
    - Create accounts for volunteer sharpeners
+   - Each sharpener gets unique login credentials
 
 2. **Configure Payment**:
-   - Set up Stripe account with MobilePay
+   - Set up Stripe account with MobilePay integration
    - Add webhook endpoints for payment confirmation
 
 3. **Test SMS**:
    - Verify GatewayAPI integration
-   - Test with Danish mobile numbers
+   - Test with Danish mobile numbers (+45)
+   - Verify language auto-detection works
+
+4. **Configure reCAPTCHA** (Optional):
+   - Set up Google reCAPTCHA v3
+   - Add site and secret keys to environment
 
 ## 🐳 Docker Deployment
 
@@ -131,10 +143,20 @@ services:
     environment:
       - GATEWAYAPI_TOKEN=your-token
       - STRIPE_SECRET_KEY=your-key
+      - STRIPE_PUBLISHABLE_KEY=your-publishable-key
       - BASE_URL=https://yourdomain.com
+      - SECRET_KEY=your-secret-key
+      - RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+      - RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
     volumes:
       - ./data:/app/instance
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 ```
 
 ### Manual Docker Commands
@@ -147,7 +169,9 @@ docker build -t skate-sharpening .
 docker run -p 8080:5000 \
   -e GATEWAYAPI_TOKEN=your-token \
   -e STRIPE_SECRET_KEY=your-key \
+  -e STRIPE_PUBLISHABLE_KEY=your-publishable-key \
   -e BASE_URL=https://yourdomain.com \
+  -e SECRET_KEY=your-secret-key \
   -v $(pwd)/data:/app/instance \
   skate-sharpening
 ```
@@ -227,6 +251,32 @@ Your skate ticket: ABC123
 ⚠️ No payment = no sharpening
 ```
 
+## 🌨️ Responsive Design
+
+### Mobile Optimizations
+
+- **Borderless cards on small screens** (<640px) for cleaner mobile UX
+- **Full card styling on larger screens** with shadows and rounded corners
+- **Touch-optimized buttons** with appropriate sizing
+- **Mobile-first form layouts** that adapt to screen size
+- **Cyan-themed background** for better visual contrast
+
+### CSS Implementation
+
+```css
+/* Responsive card wrapper classes */
+@media (max-width: 640px) {
+    .card-wrapper {
+        @apply rounded-none shadow-none p-4 bg-transparent;
+    }
+}
+@media (min-width: 641px) {
+    .card-wrapper {
+        @apply rounded-lg shadow-lg p-8 bg-white;
+    }
+}
+```
+
 ## 🔒 Security Features
 
 - **Password hashing** with Werkzeug
@@ -235,8 +285,34 @@ Your skate ticket: ABC123
 - **Environment variable secrets** (no hardcoded keys)
 - **Input validation** and SQL injection prevention
 - **HTTPS support** (configure reverse proxy)
+- **reCAPTCHA v3 integration** for bot protection
+- **CSRF protection** via Flask sessions
 
 ## 🧪 Development
+
+### Quick Commands
+
+The project includes a `Justfile` for common tasks:
+
+```bash
+# Install just (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash
+
+# List available commands
+just
+
+# Run development server
+just dev
+
+# Build Docker image
+just build
+
+# Release and deploy to staging
+just release v1.0.0
+
+# Test SMS functionality
+just test-sms
+```
 
 ### Running Tests
 
@@ -250,27 +326,53 @@ python app.py
 # Test language detection
 curl -H "Accept-Language: da-DK" http://localhost:5000/
 curl -H "Accept-Language: en-US" http://localhost:5000/
+
+# Test SMS sending (requires GATEWAYAPI_TOKEN)
+python test_sms.py
 ```
 
 ### Project Structure
 
 ```
 skate-sharpening-tickets/
-├── app.py                 # Main Flask application
+├── app.py                 # Main Flask application (all-in-one)
 ├── requirements.txt       # Python dependencies
 ├── Dockerfile            # Container definition
 ├── docker-compose.yml    # Orchestration
 ├── .dockerignore         # Build context exclusions
+├── .env.example          # Environment variable template
+├── CLAUDE.md             # AI assistant instructions
 ├── templates/            # Jinja2 templates
-│   ├── base.html
-│   ├── customer.html
-│   ├── sharpener_*.html
-│   ├── payment.html
-│   └── feedback_*.html
+│   ├── base.html         # Base layout with responsive CSS
+│   ├── customer.html     # Ticket request form
+│   ├── sharpener_login.html
+│   ├── sharpener_dashboard.html
+│   ├── create_sharpener.html
+│   ├── payment.html      # Stripe/MobilePay integration
+│   ├── payment_success.html
+│   ├── payment_failed.html
+│   ├── ticket_created.html
+│   ├── already_paid.html
+│   └── feedback_form.html
 ├── static/               # Static assets
 │   └── favicon.ico
 └── instance/             # Database directory (created automatically)
+    └── skate_tickets.db  # SQLite database
 ```
+
+## 📚 API Response Formats
+
+### Ticket Status Values
+- `unpaid` - Ticket created, awaiting payment
+- `paid` - Payment received, ready for sharpening
+- `in_progress` - Sharpener has claimed the ticket
+- `completed` - Sharpening finished, customer notified
+
+### Language Detection
+
+The system automatically detects language from the `Accept-Language` header:
+- Danish UI: `da`, `dk`, `sv`, `se`, `no`, `nb`, `nn`
+- English UI: All other language codes
 
 ## 🌟 Contributing
 
@@ -279,6 +381,14 @@ skate-sharpening-tickets/
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+### Development Guidelines
+
+- **Single file architecture**: All backend logic in `app.py`
+- **Responsive design**: Test on mobile and desktop
+- **Bilingual support**: Update both Danish and English translations
+- **Database migrations**: Handle schema changes carefully
+- **SMS testing**: Use simulation mode for development
 
 ## 📄 License
 
