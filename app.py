@@ -2,7 +2,7 @@
 
 Complete backend with database, auth, SMS, and payment integration.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 import os
 from pathlib import Path
@@ -12,10 +12,13 @@ from dotenv import load_dotenv
 from flask import (Flask, render_template, request, redirect, url_for,
                    session, flash, send_from_directory, g)
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 import requests
 import stripe
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer
 import yaml
+import secrets
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,6 +28,14 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///skate_tickets.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', '587'))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', '')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')
+
 # Handle PostgreSQL URL format for SQLAlchemy 2.0+
 if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
     app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -32,6 +43,7 @@ if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
     )
 
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 # Configure Stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
@@ -52,9 +64,11 @@ class Sharpener(db.Model):
     """Database model for skate sharpener staff accounts."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
     phone = db.Column(db.String(20), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationship
@@ -95,6 +109,18 @@ class Feedback(db.Model):
     rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Invitation(db.Model):
+    """Database model for sharpener invitations."""
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    token = db.Column(db.String(100), nullable=False, unique=True)
+    used = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
+# Initialize token serializer for invitations
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # Internationalization
 _translations_cache = {}
@@ -350,6 +376,26 @@ def login_required(f):
             return redirect(url_for('sharpener_login'))
         return f(*args, **kwargs)
     return decorated_function
+
+# Helper functions for invitations
+def generate_invitation_token(email):
+    """Generate a secure invitation token"""
+    return serializer.dumps(email, salt='invitation')
+
+def verify_invitation_token(token, max_age=86400):  # 24 hours
+    """Verify and decode invitation token"""
+    try:
+        email = serializer.loads(token, salt='invitation', max_age=max_age)
+        return email
+    except:
+        return None
+
+def send_invitation_email(email, token):
+    """Send invitation email (simulation for now)"""
+    invitation_url = url_for('accept_invitation', token=token, _external=True)
+    print(f"[EMAIL SIMULATION] Invitation sent to {email}")
+    print(f"Registration link: {invitation_url}")
+    return True
 
 # Routes
 
@@ -790,31 +836,96 @@ def feedback(ticket_code):
     return render_template('feedback_form.html', ticket=ticket)
 
 # Admin routes (for setup and testing)
-@app.route('/admin/create_sharpener', methods=['GET', 'POST'])
-def create_sharpener():
-    """Create a new sharpener account (admin only)"""
+@app.route('/admin/invite_sharpener', methods=['GET', 'POST'])
+def invite_sharpener():
+    """Send invitation to new sharpener (admin only)"""
+    if request.method == 'POST':
+        email = request.form['email']
+
+        # Check if user already exists
+        if Sharpener.query.filter_by(email=email).first():
+            flash(f'A sharpener with email {email} already exists.')
+        elif Invitation.query.filter_by(email=email, used=False).first():
+            flash(f'An invitation has already been sent to {email}.')
+        else:
+            # Create invitation
+            token = generate_invitation_token(email)
+            expires_at = datetime.utcnow() + timedelta(days=7)  # 7 days to accept
+
+            invitation = Invitation(
+                email=email,
+                token=token,
+                expires_at=expires_at
+            )
+            db.session.add(invitation)
+            db.session.commit()
+
+            # Send invitation email
+            if send_invitation_email(email, token):
+                flash(f'Invitation sent to {email}. They have 7 days to accept.')
+            else:
+                flash(f'Failed to send invitation to {email}.')
+
+    # Get existing sharpeners and pending invitations
+    sharpeners = Sharpener.query.all()
+    pending_invitations = Invitation.query.filter_by(used=False).all()
+
+    return render_template('invite_sharpener.html',
+                         sharpeners=sharpeners,
+                         pending_invitations=pending_invitations,
+                         now=datetime.utcnow())
+
+@app.route('/invitation/<token>', methods=['GET', 'POST'])
+def accept_invitation(token):
+    """Accept invitation and create sharpener account"""
+    # Verify token
+    email = verify_invitation_token(token)
+    if not email:
+        flash('Invalid or expired invitation link.')
+        return redirect(url_for('index'))
+
+    # Check if invitation exists and is not used
+    invitation = Invitation.query.filter_by(email=email, token=token, used=False).first()
+    if not invitation or invitation.expires_at < datetime.utcnow():
+        flash('Invitation has expired or been used.')
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         name = request.form['name']
         phone = request.form['phone']
         username = request.form['username']
         password = request.form['password']
 
+        # Validate inputs
         if Sharpener.query.filter_by(username=username).first():
-            flash(t('username_exists'))
+            flash('Username already exists. Please choose another.')
+        elif Sharpener.query.filter_by(email=email).first():
+            flash('Account already exists for this email.')
         else:
+            # Create sharpener account
             sharpener = Sharpener(
                 name=name,
+                email=email,
                 phone=phone,
                 username=username,
                 password_hash=generate_password_hash(password)
             )
             db.session.add(sharpener)
-            db.session.commit()
-            flash(t('sharpener_created', name))
-            return redirect(url_for('create_sharpener'))
 
-    sharpeners = Sharpener.query.all()
-    return render_template('create_sharpener.html', sharpeners=sharpeners)
+            # Mark invitation as used
+            invitation.used = True
+            db.session.commit()
+
+            flash('Account created successfully! You can now login.')
+            return redirect(url_for('sharpener_login'))
+
+    return render_template('accept_invitation.html', email=email)
+
+# Keep old route for backward compatibility
+@app.route('/admin/create_sharpener', methods=['GET', 'POST'])
+def create_sharpener():
+    """Redirect to new invitation-based system"""
+    return redirect(url_for('invite_sharpener'))
 
 # Initialize database
 def create_tables():
