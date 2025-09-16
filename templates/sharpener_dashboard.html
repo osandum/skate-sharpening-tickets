@@ -38,7 +38,7 @@
     </div>
 
     <!-- Personal Stats -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <div class="card-wrapper-compact mb-6">
         <h2 class="text-xl font-semibold mb-4">📊 {{ t('my_performance') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="text-center">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Work Queue -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <div class="card-wrapper-compact mb-6">
         <h2 class="text-xl font-semibold mb-4 flex items-center">
             🎯 {{ t('ready_for_sharpening') }} ({{ ready_tickets|length }})
         </h2>
@@ -93,7 +93,7 @@
 
     <!-- In Progress -->
     {% if in_progress_tickets %}
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="card-wrapper-compact mb-6">
             <h2 class="text-xl font-semibold mb-4">⚡ {{ t('in_progress_tickets') }}</h2>
             <div class="space-y-3">
                 {% for ticket in in_progress_tickets %}
@@ -123,7 +123,7 @@
 
     <!-- Recent Feedback -->
     {% if my_recent_tickets %}
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="card-wrapper-compact">
             <h2 class="text-xl font-semibold mb-4">💬 {{ t('recent_work') }} & {{ t('feedback') }}</h2>
             <div class="space-y-3">
                 {% for ticket in my_recent_tickets %}
