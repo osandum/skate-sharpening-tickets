@@ -10,11 +10,29 @@
         .btn-primary { @apply bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors; }
         .btn-success { @apply bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors; }
         .btn-danger { @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors; }
+
+        /* Remove card borders on small screens */
+        @media (max-width: 640px) {
+            .card-wrapper {
+                @apply rounded-none shadow-none p-4 bg-transparent;
+            }
+            .card-wrapper-compact {
+                @apply rounded-none shadow-none p-4 bg-transparent;
+            }
+        }
+        @media (min-width: 641px) {
+            .card-wrapper {
+                @apply rounded-lg shadow-lg p-8 bg-white;
+            }
+            .card-wrapper-compact {
+                @apply rounded-lg shadow-lg p-6 bg-white;
+            }
+        }
     </style>
     <!-- Google reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
 </head>
-<body class="bg-blue-50 min-h-screen">
+<body class="bg-cyan-200 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
