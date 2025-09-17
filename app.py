@@ -13,6 +13,7 @@ from flask import (Flask, render_template, request, redirect, url_for,
                    session, flash, send_from_directory, g)
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
+from flask_migrate import Migrate
 import requests
 import stripe
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -44,6 +45,7 @@ if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
 
 db = SQLAlchemy(app)
 mail = Mail(app)
+migrate = Migrate(app, db)
 
 # Configure Stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
