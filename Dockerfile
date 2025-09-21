@@ -4,6 +4,13 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
+LABEL org.opencontainers.image.source="https://github.com/osandum/skate-sharpening-tickets.git"
+LABEL org.opencontainers.image.description="Docker image for skate sharpening tickets application"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.url="https://github.com/osandum/skate-sharpening-tickets"
+LABEL org.opencontainers.image.vendor="osandum"
+LABEL org.opencontainers.image.version="1.0.0"
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
