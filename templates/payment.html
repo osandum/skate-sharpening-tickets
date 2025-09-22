@@ -55,14 +55,14 @@
         {% else %}
         <!-- Simulation Mode -->
         <div class="space-y-4">
-            <form method="POST" action="{{ url_for('payment_process', ticket_code=ticket.code) }}" id="payment-form">
+            <form method="POST" action="{{ url_for('customer.payment_process', ticket_code=ticket.code) }}" id="payment-form">
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
                     📱 {{ t('pay_now') }} ({{ sharpening_price }} DKK) - [SIMULATION]
                 </button>
             </form>
 
             <div class="text-center">
-                <a href="{{ url_for('payment_success', ticket_code=ticket.code) }}" class="text-sm text-blue-600 hover:text-blue-800">
+                <a href="{{ url_for('customer.payment_return', ticket_code=ticket.code) }}" class="text-sm text-blue-600 hover:text-blue-800">
                     [Demo: View payment status]
                 </a>
             </div>
@@ -110,7 +110,7 @@ async function initPayment() {
         const res = await stripe.confirmPayment({
           clientSecret: '{{ client_secret }}',
           confirmParams: {
-            return_url: "{{ url_for('payment_return', ticket_code=ticket.code, _external=True) }}",
+            return_url: "{{ url_for('customer.payment_return', ticket_code=ticket.code, _external=True) }}",
           },
         });
 
@@ -125,7 +125,7 @@ async function initPayment() {
             spinner.classList.add('hidden');
         } else {
             // Payment succeeded, redirect to return page
-            window.location.href = "{{ url_for('payment_return', ticket_code=ticket.code) }}";
+            window.location.href = "{{ url_for('customer.payment_return', ticket_code=ticket.code) }}";
         }
     });
 }
