@@ -96,7 +96,15 @@ status_in_progress: "I gang"
 status_completed: "Færdig"
 
 claim_ticket: "Claim"
+unclaim_ticket: "Afmeld"
 complete_ticket: "Færdiggør"
+
+# Flash messages
+ticket_not_available: "Billet er ikke tilgængelig"
+ticket_claimed: "Billet {0} er blevet claimed"
+ticket_unclaimed: "Billet {0} er blevet afmeldt"
+ticket_completed: "Billet {0} er blevet færdiggjort"
+cannot_unclaim: "Kan ikke afmelde denne billet"
 
 ticket_details: "Billetdetaljer"
 ticket_code: "Billetkode"
