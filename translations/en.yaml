@@ -95,7 +95,15 @@ status_in_progress: "In Progress"
 status_completed: "Completed"
 
 claim_ticket: "Claim"
+unclaim_ticket: "Unclaim"
 complete_ticket: "Complete"
+
+# Flash messages
+ticket_not_available: "Ticket is not available"
+ticket_claimed: "Ticket {0} has been claimed"
+ticket_unclaimed: "Ticket {0} has been unclaimed"
+ticket_completed: "Ticket {0} has been completed"
+cannot_unclaim: "Cannot unclaim this ticket"
 
 ticket_details: "Ticket Details"
 ticket_code: "Ticket Code"

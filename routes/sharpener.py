@@ -84,6 +84,24 @@ def claim_ticket(ticket_id):
     flash(t('ticket_claimed', ticket.code))
     return redirect(url_for('sharpener.dashboard'))
 
+@sharpener_bp.route('/unclaim/<int:ticket_id>')
+@login_required
+def unclaim_ticket(ticket_id):
+    """Unclaim a ticket and return it to paid status"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+
+    if ticket.status != 'in_progress' or ticket.sharpened_by_id != session['sharpener_id']:
+        flash(t('cannot_unclaim'))
+        return redirect(url_for('sharpener.dashboard'))
+
+    ticket.status = 'paid'
+    ticket.started_at = None
+    ticket.sharpened_by_id = None
+    db.session.commit()
+
+    flash(t('ticket_unclaimed', ticket.code))
+    return redirect(url_for('sharpener.dashboard'))
+
 @sharpener_bp.route('/complete/<int:ticket_id>')
 @login_required
 def complete_ticket(ticket_id):
