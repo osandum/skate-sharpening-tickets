@@ -108,7 +108,7 @@ def payment_page(ticket_code):
             # Try to retrieve the existing payment intent
             payment_intent = stripe.PaymentIntent.retrieve(ticket.payment_id)
             # Check if the intent is still usable (not expired/canceled)
-            if payment_intent.status in ['requires_payment_method', 'requires_confirmation', 'requires_action']:
+            if payment_intent.status in ['requires_confirmation', 'requires_action']:
                 client_secret = payment_intent.client_secret
                 print(f"[Stripe] Reusing existing payment intent {ticket.payment_id} for ticket {ticket.code}")
             else:
