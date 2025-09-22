@@ -110,9 +110,14 @@
                                         Started: {{ ticket.started_at.strftime('%H:%M') if ticket.started_at else 'Unknown' }}
                                     </div>
                                 </div>
-                                <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
-                                    {{ t('complete_ticket') }}
-                                </a>
+                                <div class="flex space-x-2">
+                                    <a href="{{ url_for('sharpener.unclaim_ticket', ticket_id=ticket.id) }}" class="btn-secondary">
+                                        {{ t('unclaim_ticket') }}
+                                    </a>
+                                    <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                        {{ t('complete_ticket') }}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
