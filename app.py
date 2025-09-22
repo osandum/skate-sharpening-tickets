@@ -324,7 +324,10 @@ def create_stripe_payment_intent(amount, ticket):
         payment_intent = stripe.PaymentIntent.create(
             amount=amount_in_ore,
             currency='dkk',
-            payment_method_types=['mobilepay'],  # Can add 'mobilepay' when available in Denmark
+            payment_method_types=['mobilepay'],
+            payment_method_data={
+                'type': 'mobilepay'
+            },
             metadata={
                 'ticket_code': ticket.code,
                 'customer_name': ticket.customer_name,
