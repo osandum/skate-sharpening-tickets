@@ -60,6 +60,8 @@ BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 SHARPENING_PRICE_DKK = int(os.environ.get('SHARPENING_PRICE_DKK', '80'))
+TICKET_CODE_LENGTH = int(os.environ.get('TICKET_CODE_LENGTH', '5'))
+TICKET_CODE_ALPHABET = os.environ.get('TICKET_CODE_ALPHABET', 'ABCEFGHJKMNPQRSTUVWXYZ23456789')
 
 # Database Models
 class Sharpener(db.Model):
@@ -228,10 +230,10 @@ def inject_translate():
 
 # Helper Functions
 def generate_ticket_code():
-    """Generate a 5-character ticket code using unambiguous characters"""
-    # Exclude confusing characters: 0/O, 1/I/L, D (looks like 0)
-    chars = "ABCEFGHJKMNPQRSTUVWXYZ23456789"
-    return ''.join(random.choices(chars, k=5))
+    """Generate a ticket code using configurable length and alphabet"""
+    # Use configurable alphabet and length (defaults: unambiguous chars, 5 chars)
+    # Default excludes confusing characters: 0/O, 1/I/L, D (looks like 0)
+    return ''.join(random.choices(TICKET_CODE_ALPHABET, k=TICKET_CODE_LENGTH))
 
 def normalize_phone_number(phone):
     """Normalize Danish phone number to international format"""
