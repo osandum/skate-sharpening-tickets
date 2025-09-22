@@ -10,7 +10,7 @@
         </h1>
         <div class="flex items-center space-x-4">
             <span class="text-gray-600">Welcome, {{ session.sharpener_name }}</span>
-            <a href="{{ url_for('sharpener_logout') }}" class="text-red-600 hover:text-red-800">{{ t('logout') }}</a>
+            <a href="{{ url_for('sharpener.logout') }}" class="text-red-600 hover:text-red-800">{{ t('logout') }}</a>
         </div>
     </div>
 
@@ -77,7 +77,7 @@
                                     Paid: {{ ticket.paid_at.strftime('%H:%M') if ticket.paid_at else 'Unknown' }}
                                 </div>
                             </div>
-                            <a href="{{ url_for('claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                            <a href="{{ url_for('sharpener.claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
                                 {{ t('claim_ticket') }}
                             </a>
                         </div>
@@ -110,7 +110,7 @@
                                         Started: {{ ticket.started_at.strftime('%H:%M') if ticket.started_at else 'Unknown' }}
                                     </div>
                                 </div>
-                                <a href="{{ url_for('complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
                                     {{ t('complete_ticket') }}
                                 </a>
                             </div>
