@@ -487,11 +487,6 @@ def request_ticket():
     db.session.add(ticket)
     db.session.commit()
 
-    # Create payment intent
-    payment_id = create_stripe_payment_intent(SHARPENING_PRICE_DKK, ticket)
-    ticket.payment_id = payment_id
-    db.session.commit()
-
     # Send SMS with payment link
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
 
@@ -539,15 +534,39 @@ def payment_page(ticket_code):
     if ticket.status != 'unpaid':
         return render_template('already_paid.html', ticket=ticket)
 
-    # Get client_secret for Stripe payment
+    # Create or retrieve payment intent on-demand
     client_secret = None
+
+    # Check if we have a valid existing payment intent
     if ticket.payment_id and not ticket.payment_id.startswith('pi_simulation_'):
         try:
-            # Retrieve the payment intent to get client_secret
+            # Try to retrieve the existing payment intent
             payment_intent = stripe.PaymentIntent.retrieve(ticket.payment_id)
-            client_secret = payment_intent.client_secret
+            # Check if the intent is still usable (not expired/canceled)
+            if payment_intent.status in ['requires_payment_method', 'requires_confirmation', 'requires_action']:
+                client_secret = payment_intent.client_secret
+                print(f"[Stripe] Reusing existing payment intent {ticket.payment_id} for ticket {ticket.code}")
+            else:
+                # Intent is no longer usable, create a new one
+                print(f"[Stripe] Payment intent {ticket.payment_id} status is {payment_intent.status}, creating new one")
+                ticket.payment_id = None
         except Exception as e:
             print(f"[Stripe] Error retrieving payment intent: {e}")
+            ticket.payment_id = None
+
+    # Create a new payment intent if needed
+    if not ticket.payment_id:
+        payment_id = create_stripe_payment_intent(SHARPENING_PRICE_DKK, ticket)
+        ticket.payment_id = payment_id
+        db.session.commit()
+        print(f"[Stripe] Created new payment intent {payment_id} for ticket {ticket.code}")
+
+        if not payment_id.startswith('pi_simulation_'):
+            try:
+                payment_intent = stripe.PaymentIntent.retrieve(payment_id)
+                client_secret = payment_intent.client_secret
+            except Exception as e:
+                print(f"[Stripe] Error retrieving new payment intent: {e}")
 
     return render_template('payment.html',
                          ticket=ticket,
