@@ -309,4 +309,4 @@ def feedback(ticket_code):
 @customer_bp.route('/favicon.ico')
 def favicon():
     """Serve favicon"""
-    return send_from_directory('.', 'favicon.ico')
+    return send_from_directory('static', 'favicon.ico')
