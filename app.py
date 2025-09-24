@@ -16,6 +16,7 @@ from itsdangerous import URLSafeTimedSerializer
 # Import our modules
 from models import db, Ticket, Sharpener, Feedback
 from utils.i18n import t
+from utils.banner import print_startup_banner
 from routes import register_blueprints
 
 # Load environment variables from .env file
@@ -23,6 +24,9 @@ load_dotenv()
 
 def create_app():
     """Application factory pattern"""
+    # Print startup banner (will show in both dev and production)
+    print_startup_banner()
+
     app = Flask(__name__)
 
     # Configuration
