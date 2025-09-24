@@ -14,7 +14,7 @@ LABEL org.opencontainers.image.version="1.0.0"
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV FLASK_APP=app_refactored.py
+ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
 # Install system dependencies
@@ -56,5 +56,11 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:5000/', timeout=5)"
 
+# Build-time arguments for version info (placed at end to preserve layer caching)
+ARG BUILD_TIME
+ARG GIT_HASH
+ENV BUILD_TIME=${BUILD_TIME}
+ENV GIT_HASH=${GIT_HASH}
+
 # Run database migrations and start the application
-CMD ["sh", "-c", "flask db upgrade && if [ \"$FLASK_ENV\" = \"production\" ]; then gunicorn --bind 0.0.0.0:5000 --workers 2 app_refactored:app; else python app_refactored.py; fi"]
+CMD ["sh", "-c", "flask db upgrade && if [ \"$FLASK_ENV\" = \"production\" ]; then gunicorn --bind 0.0.0.0:5000 --workers 2 app:app; else python app.py; fi"]

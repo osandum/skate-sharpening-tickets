@@ -87,6 +87,8 @@ def request_ticket():
     return render_template('ticket_created.html',
                          ticket=ticket_info,
                          payment_url=payment_url,
+                         customer_name=ticket_info['customer_name'],
+                         phone_number=ticket.customer_phone,
                          skate_brand=ticket_info['skate_brand'],
                          skate_color=ticket_info['skate_color'],
                          skate_size=ticket_info['skate_size'])
