@@ -66,41 +66,59 @@ def dashboard():
                          avg_rating=round(avg_rating, 1),
                          feedback_count=len(feedbacks))
 
+@sharpener_bp.route('/unpaid')
+@login_required
+def unpaid_tickets():
+    """View all unpaid tickets"""
+    unpaid_tickets = Ticket.query.filter_by(status='unpaid').order_by(Ticket.created_at.desc()).all()
+    return render_template('unpaid_tickets.html', unpaid_tickets=unpaid_tickets, now=datetime.utcnow())
+
 @sharpener_bp.route('/claim/<int:ticket_id>')
 @login_required
 def claim_ticket(ticket_id):
     """Claim a ticket for sharpening"""
     ticket = Ticket.query.get_or_404(ticket_id)
 
-    if ticket.status != 'paid':
-        flash(t('ticket_not_available'))
+    if ticket.status == 'unpaid':
+        # Promote unpaid ticket to paid status (claimed for processing)
+        ticket.status = 'paid'
+        db.session.commit()
+        flash(t('unpaid_ticket_claimed', ticket.code))
+        return redirect(request.referrer or url_for('sharpener.dashboard'))
+    elif ticket.status == 'paid':
+        # Normal claim: move to in_progress
+        ticket.status = 'in_progress'
+        ticket.started_at = datetime.utcnow()
+        ticket.sharpened_by_id = session['sharpener_id']
+        db.session.commit()
+        flash(t('ticket_claimed', ticket.code))
         return redirect(url_for('sharpener.dashboard'))
-
-    ticket.status = 'in_progress'
-    ticket.started_at = datetime.utcnow()
-    ticket.sharpened_by_id = session['sharpener_id']
-    db.session.commit()
-
-    flash(t('ticket_claimed', ticket.code))
-    return redirect(url_for('sharpener.dashboard'))
+    else:
+        flash(t('ticket_not_available'))
+        return redirect(request.referrer or url_for('sharpener.dashboard'))
 
 @sharpener_bp.route('/unclaim/<int:ticket_id>')
 @login_required
 def unclaim_ticket(ticket_id):
-    """Unclaim a ticket and return it to paid status"""
+    """Unclaim a ticket and return it to previous status"""
     ticket = Ticket.query.get_or_404(ticket_id)
 
-    if ticket.status != 'in_progress' or ticket.sharpened_by_id != session['sharpener_id']:
+    if ticket.status == 'in_progress' and ticket.sharpened_by_id == session['sharpener_id']:
+        # Return in_progress ticket to paid status
+        ticket.status = 'paid'
+        ticket.started_at = None
+        ticket.sharpened_by_id = None
+        db.session.commit()
+        flash(t('ticket_unclaimed', ticket.code))
+    elif ticket.status == 'paid' and not ticket.sharpened_by_id:
+        # Return claimed unpaid ticket back to unpaid status
+        ticket.status = 'unpaid'
+        db.session.commit()
+        flash(t('ticket_unclaimed', ticket.code))
+    else:
         flash(t('cannot_unclaim'))
-        return redirect(url_for('sharpener.dashboard'))
 
-    ticket.status = 'paid'
-    ticket.started_at = None
-    ticket.sharpened_by_id = None
-    db.session.commit()
-
-    flash(t('ticket_unclaimed', ticket.code))
-    return redirect(url_for('sharpener.dashboard'))
+    return redirect(request.referrer or url_for('sharpener.dashboard'))
 
 @sharpener_bp.route('/complete/<int:ticket_id>')
 @login_required

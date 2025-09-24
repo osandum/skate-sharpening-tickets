@@ -17,8 +17,11 @@
     <!-- Stats Overview -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 text-center">
-            <div class="text-3xl font-bold text-yellow-800">{{ unpaid_count }}</div>
-            <div class="text-yellow-600">{{ t('tickets_awaiting_payment') }}</div>
+            <a href="{{ url_for('sharpener.unpaid_tickets') }}" class="block hover:bg-yellow-100 transition-colors rounded-lg -m-4 p-4">
+                <div class="text-3xl font-bold text-yellow-800">{{ unpaid_count }}</div>
+                <div class="text-yellow-600">{{ t('tickets_awaiting_payment') }}</div>
+                <div class="text-xs text-yellow-500 mt-1">{{ t('click_to_view') }}</div>
+            </a>
         </div>
 
         <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center">
