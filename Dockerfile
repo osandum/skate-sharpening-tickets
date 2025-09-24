@@ -17,6 +17,12 @@ ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
+# Build-time arguments for version info
+ARG BUILD_TIME
+ARG GIT_HASH
+ENV BUILD_TIME=${BUILD_TIME}
+ENV GIT_HASH=${GIT_HASH}
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
