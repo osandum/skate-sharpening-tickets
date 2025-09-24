@@ -134,7 +134,7 @@ initPayment();
 </script>
 
 <style>
-.spinner {
+.spinner:not(.hidden) {
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -142,6 +142,10 @@ initPayment();
     border-radius: 50%;
     border-top-color: white;
     animation: spin 1s ease-in-out infinite;
+}
+
+.spinner.hidden {
+    display: none !important;
 }
 
 @keyframes spin {
