@@ -8,6 +8,8 @@ registry := "sandum.net:5000/osa"
 # Build Docker image
 build version='latest':
     docker build -t {{image_name}}:{{version}} \
+    --build-arg BUILD_TIME="$(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
+    --build-arg GIT_HASH="$(git rev-parse HEAD)" \
     --label org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
     --label org.opencontainers.image.source="$(git config --get remote.origin.url | sed 's/\.git$//')" \
     --label org.opencontainers.image.revision="$(git rev-parse HEAD)" \

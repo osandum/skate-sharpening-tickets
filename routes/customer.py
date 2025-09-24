@@ -17,22 +17,39 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 
 @customer_bp.route('/')
 def index():
-    return render_template('customer.html')
+    # Brands as tuples (key, value) for translation
+    brands = [
+        ('jackson', 'Jackson'),
+        ('edea', 'EDEA'),
+        ('risport', 'Risport'),
+        ('riedell', 'Riedell'),
+        ('graf', 'Graf'),
+        ('other', 'Other')
+    ]
+    # Colors as tuples (key, value) for translation
+    colors = [
+        ('white', 'White'),
+        ('black', 'Black'),
+        ('other', 'Other')
+    ]
+    sizes = list(range(24, 47))  # 24-46
+
+    return render_template('customer.html', brands=brands, colors=colors, sizes=sizes)
 
 @customer_bp.route('/request_ticket', methods=['POST'])
 def request_ticket():
     """Create a new ticket request"""
     # Get form data
-    name = request.form['customer_name'].strip()
-    phone = request.form['customer_phone'].strip()
+    name = request.form['name'].strip()
+    phone = request.form['phone'].strip()
     brand = request.form['brand'].strip()
     color = request.form['color'].strip()
     size = int(request.form['size'])
 
     # Store form data in session for potential retry
     session['ticket_form_data'] = {
-        'customer_name': name,
-        'customer_phone': phone,
+        'name': name,
+        'phone': phone,
         'brand': brand,
         'color': color,
         'size': size
