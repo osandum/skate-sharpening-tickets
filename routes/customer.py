@@ -32,9 +32,17 @@ def index():
         ('black', 'Black'),
         ('other', 'Other')
     ]
-    sizes = list(range(24, 47))  # 24-46
+    # Standard EU sizes (24-46)
+    sizes = list(range(24, 47))
 
-    return render_template('customer.html', brands=brands, colors=colors, sizes=sizes)
+    # EDEA sizes (185-310 in steps of 5)
+    edea_sizes = list(range(185, 315, 5))
+
+    return render_template('customer.html',
+                         brands=brands,
+                         colors=colors,
+                         sizes=sizes,
+                         edea_sizes=edea_sizes)
 
 @customer_bp.route('/request_ticket', methods=['POST'])
 def request_ticket():

@@ -69,12 +69,15 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('skate_size') }} *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span id="size-label">{{ t('skate_size') }}</span> *
+                            <span id="edea-indicator" class="text-xs text-blue-600 hidden">{{ t('edea_size_indicator') }}</span>
+                        </label>
                         <select name="size" id="size" required
                                 class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white">
                             <option value="">{{ t('select_size') }}</option>
                             {% for size in sizes %}
-                                <option value="{{ size }}">{{ size }}</option>
+                                <option value="{{ size }}" data-size-type="standard">{{ size }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -94,16 +97,65 @@
 </div>
 
 <script>
-// localStorage persistence for form fields
+// EDEA size data
+const edeaSizes = {{ edea_sizes | tojson }};
+const standardSizes = {{ sizes | tojson }};
+
+// Dynamic size switching based on brand
 document.addEventListener('DOMContentLoaded', function() {
+    const brandSelect = document.getElementById('brand');
+    const sizeSelect = document.getElementById('size');
+    const edeaIndicator = document.getElementById('edea-indicator');
+
+    function updateSizeOptions(isEdea) {
+        const currentValue = sizeSelect.value;
+        const sizes = isEdea ? edeaSizes : standardSizes;
+
+        // Clear current options except the placeholder
+        sizeSelect.innerHTML = '<option value="">{{ t("select_size") }}</option>';
+
+        // Add appropriate size options
+        sizes.forEach(function(size) {
+            const option = document.createElement('option');
+            option.value = size;
+            option.textContent = size;
+            option.setAttribute('data-size-type', isEdea ? 'edea' : 'standard');
+            sizeSelect.appendChild(option);
+        });
+
+        // Show/hide EDEA indicator
+        if (isEdea) {
+            edeaIndicator.classList.remove('hidden');
+        } else {
+            edeaIndicator.classList.add('hidden');
+        }
+
+        // Try to restore value if it's still valid
+        if (currentValue && sizes.includes(parseInt(currentValue))) {
+            sizeSelect.value = currentValue;
+        }
+    }
+
+    // Listen for brand changes
+    brandSelect.addEventListener('change', function() {
+        const isEdea = this.value === 'EDEA';
+        updateSizeOptions(isEdea);
+    });
+
+    // Initialize on page load
+    if (brandSelect.value === 'EDEA') {
+        updateSizeOptions(true);
+    }
+
+    // localStorage persistence for form fields
     const fields = ['phone', 'name', 'brand', 'color', 'size'];
-    
+
     // Check if localStorage is available
     if (typeof(Storage) === "undefined") {
         console.log("localStorage not supported");
         return;
     }
-    
+
     // Load saved values from localStorage
     fields.forEach(function(fieldName) {
         const field = document.getElementById(fieldName);
@@ -111,9 +163,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (field && savedValue) {
             field.value = savedValue;
             console.log('Restored ' + fieldName + ': ' + savedValue);
+
+            // If brand was restored, update size options
+            if (fieldName === 'brand' && savedValue === 'EDEA') {
+                updateSizeOptions(true);
+            }
         }
     });
-    
+
     // Save values to localStorage on input
     fields.forEach(function(fieldName) {
         const field = document.getElementById(fieldName);
