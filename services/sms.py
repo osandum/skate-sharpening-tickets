@@ -25,11 +25,32 @@ def render_sms_template(template_name, **context):
                 return f"SMS template error: {template_name}"
         return f"SMS template error: {template_name}"
 
+def detect_optimal_encoding(message):
+    """Detect the cheapest encoding that can handle the message"""
+    # GSM 7-bit character set (most common Danish/European chars)
+    gsm_basic = set(
+        "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?"
+        "¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà"
+    )
+    # Extended GSM characters (count as 2 chars each)
+    gsm_extended = set("^{}\\[~]|€")
+
+    # Check if message can use GSM7
+    for char in message:
+        if char not in gsm_basic and char not in gsm_extended:
+            # Character not in GSM7, must use UCS2
+            return "UCS2"
+
+    return "GSM0338"
+
 def send_sms(phone, message):
-    """Send SMS using GatewayAPI"""
+    """Send SMS using GatewayAPI with automatic encoding detection"""
     if not GATEWAYAPI_TOKEN or GATEWAYAPI_TOKEN == 'your-gatewayapi-token':
         # Simulation mode for development
+        encoding = detect_optimal_encoding(message)
         print(f"[SMS SIMULATION] To: {phone}")
+        print(f"[SMS SIMULATION] Encoding: {encoding}")
+        print(f"[SMS SIMULATION] Length: {len(message)} chars")
         print(f"[SMS SIMULATION] Message: {message}")
         print("-" * 50)
         return True
@@ -37,12 +58,20 @@ def send_sms(phone, message):
     # Normalize phone number
     msisdn = normalize_phone_number(phone)
 
+    # Automatically detect optimal encoding
+    encoding = detect_optimal_encoding(message)
+
     data = {
         "sender":     "SKK Ticket",         # Sender name (max 11 chars)
         "message":    message,              # Message content
-        "encoding":   "UCS2",               # Use UCS2 for special characters
         "recipients": [{"msisdn": msisdn}]  # Recipient list
     }
+
+    # Only set encoding if UCS2 is needed (GSM-7 is default)
+    if encoding == "UCS2":
+        data["encoding"] = "UCS2"
+
+    print(f"[SMS] Using {encoding} encoding for {len(message)} chars")
 
     try:
         print(f"[SMS] Sending to {msisdn}...")
