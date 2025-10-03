@@ -94,29 +94,26 @@ def request_ticket():
     payment_url = f"{BASE_URL}/pay/{ticket.code}"
 
     sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
-    send_sms(phone, sms_message)
+    sms_success = send_sms(phone, sms_message)
 
     # Clear form data from session on success
     if 'ticket_form_data' in session:
         del session['ticket_form_data']
 
-    # Render confirmation page
-    ticket_info = {
+    # Store confirmation data in session for redirect
+    session['ticket_confirmation'] = {
         'code': ticket.code,
         'customer_name': ticket.customer_name,
+        'phone_number': ticket.customer_phone,
         'skate_brand': ticket.brand,
         'skate_color': ticket.color,
-        'skate_size': ticket.size
+        'skate_size': ticket.size,
+        'payment_url': payment_url,
+        'sms_success': sms_success
     }
 
-    return render_template('ticket_created.html',
-                         ticket=ticket_info,
-                         payment_url=payment_url,
-                         customer_name=ticket_info['customer_name'],
-                         phone_number=ticket.customer_phone,
-                         skate_brand=ticket_info['skate_brand'],
-                         skate_color=ticket_info['skate_color'],
-                         skate_size=ticket_info['skate_size'])
+    # Redirect to confirmation page (PRG pattern to prevent duplicate submissions)
+    return redirect(url_for('customer.ticket_created'))
 
 @customer_bp.route('/pay/<ticket_code>')
 def payment_page(ticket_code):
@@ -168,7 +165,32 @@ def payment_page(ticket_code):
 @customer_bp.route('/ticket/created')
 def ticket_created():
     """Show ticket creation confirmation page"""
-    return render_template('ticket_created.html')
+    # Retrieve confirmation data from session
+    confirmation = session.pop('ticket_confirmation', None)
+
+    if not confirmation:
+        # If no confirmation data, redirect to home
+        flash(t('session_expired'), 'error')
+        return redirect(url_for('customer.index'))
+
+    # Prepare ticket info for template
+    ticket_info = {
+        'code': confirmation['code'],
+        'customer_name': confirmation['customer_name'],
+        'skate_brand': confirmation['skate_brand'],
+        'skate_color': confirmation['skate_color'],
+        'skate_size': confirmation['skate_size']
+    }
+
+    return render_template('ticket_created.html',
+                         ticket=ticket_info,
+                         payment_url=confirmation['payment_url'],
+                         customer_name=confirmation['customer_name'],
+                         phone_number=confirmation['phone_number'],
+                         skate_brand=confirmation['skate_brand'],
+                         skate_color=confirmation['skate_color'],
+                         skate_size=confirmation['skate_size'],
+                         sms_success=confirmation['sms_success'])
 
 @customer_bp.route('/payment_process/<ticket_code>', methods=['POST'])
 def payment_process(ticket_code):
