@@ -9,6 +9,7 @@
             ✅ {{ t('ticket_created_title') }}
         </h1>
 
+        {% if sms_success %}
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <div class="text-center text-green-800">
                 <div class="text-4xl mb-2">📱</div>
@@ -16,6 +17,22 @@
                 <p class="text-sm">{{ t('sms_sent_to') }}: <strong>{{ phone_number }}</strong></p>
             </div>
         </div>
+        {% else %}
+        <div class="bg-red-50 border-2 border-red-500 rounded-lg p-6 mb-6">
+            <div class="text-center text-red-800">
+                <div class="text-5xl mb-3">⚠️</div>
+                <p class="text-xl font-bold mb-3">{{ t('sms_send_failed') }}</p>
+                <p class="text-sm mb-4">{{ t('sms_failed_explanation') }}</p>
+                <div class="bg-white border border-red-300 rounded p-3 mb-4">
+                    <p class="text-sm font-semibold mb-2">{{ t('your_ticket_code') }}:</p>
+                    <p class="text-3xl font-mono font-bold text-red-700">{{ ticket.code }}</p>
+                    <p class="text-xs text-red-600 mt-2">{{ t('write_this_down') }}</p>
+                </div>
+                <p class="text-sm font-semibold">{{ t('payment_link') }}:</p>
+                <a href="{{ payment_url }}" class="text-blue-600 hover:underline break-all text-sm">{{ payment_url }}</a>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-blue-800 mb-2">{{ t('request_details') }}:</h3>
