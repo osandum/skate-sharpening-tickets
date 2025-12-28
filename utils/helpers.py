@@ -3,7 +3,7 @@ import random
 
 # Configuration
 TICKET_CODE_LENGTH = int(os.environ.get('TICKET_CODE_LENGTH', '5'))
-TICKET_CODE_ALPHABET = os.environ.get('TICKET_CODE_ALPHABET', 'ABCEFGHJKMNPQRSTUVWXYZ23456789')
+TICKET_CODE_ALPHABET = os.environ.get('TICKET_CODE_ALPHABET', 'CEFHJKMNPQRTUVWXY379')
 
 def generate_ticket_code():
     """Generate a ticket code using configurable length and alphabet"""
