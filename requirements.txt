@@ -4,7 +4,7 @@ Flask-Mail==0.9.1
 Flask-Migrate==4.1.0
 Werkzeug==2.3.7
 requests==2.31.0
-psycopg2-binary==2.9.7
+# psycopg2-binary==2.9.7  # Commented out - using SQLite for now
 gunicorn==21.2.0
 PyYAML==6.0.1
 python-dotenv==1.0.0
