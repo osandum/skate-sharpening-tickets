@@ -5,6 +5,7 @@ import stripe
 from models import db, Ticket, Feedback
 from services import send_sms, render_sms_template, create_stripe_payment_intent
 from utils import generate_ticket_code, normalize_phone_number, t
+from utils.notifications import notify_sharpeners_new_ticket
 from flask import send_from_directory
 
 customer_bp = Blueprint('customer', __name__)
@@ -222,6 +223,9 @@ def payment_process(ticket_code):
         ticket.paid_at = datetime.utcnow()
         db.session.commit()
 
+        # Notify all sharpeners about new ticket
+        notify_sharpeners_new_ticket(ticket)
+
         # Send confirmation SMS only if configured
         send_payment_confirmation_sms = os.environ.get('SEND_PAYMENT_CONFIRMATION_SMS', 'false').lower() == 'true'
         if send_payment_confirmation_sms:
@@ -324,6 +328,9 @@ def stripe_webhook():
 
                 print(f"[Stripe Webhook] Payment confirmed for ticket {ticket_code}")
 
+                # Notify all sharpeners about new ticket
+                notify_sharpeners_new_ticket(ticket)
+
                 # Send confirmation SMS only if configured
                 send_payment_confirmation_sms = os.environ.get('SEND_PAYMENT_CONFIRMATION_SMS', 'false').lower() == 'true'
                 if send_payment_confirmation_sms:
@@ -369,6 +376,9 @@ def confirm_ticket_process(ticket_code):
         ticket.status = 'paid'
         ticket.paid_at = datetime.utcnow()
         db.session.commit()
+
+        # Notify all sharpeners about new ticket
+        notify_sharpeners_new_ticket(ticket)
 
     return render_template('ticket_confirmed.html', ticket=ticket)
 

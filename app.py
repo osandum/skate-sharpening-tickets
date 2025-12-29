@@ -31,6 +31,7 @@ def create_app():
 
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    app.config['BASE_URL'] = os.environ.get('BASE_URL', 'http://localhost:5000')
 
     # Use absolute path for SQLite database to avoid path resolution issues
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -43,6 +44,14 @@ def create_app():
         app.config['SQLALCHEMY_DATABASE_URI'] = (
             app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
         )
+
+    # Email configuration
+    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@skk.dk')
 
     # Initialize extensions
     db.init_app(app)
