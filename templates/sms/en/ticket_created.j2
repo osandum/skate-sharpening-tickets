@@ -1,4 +1,8 @@
 Ticket code: {{ticket.code}}
 Write ticket code and your name on paper and place it in the skates before drop-off.
 
+{% if ticket.price > 0 %}
 Pay: {{payment_url}}
+{% else %}
+Confirm request: {{confirm_url}}
+{% endif %}

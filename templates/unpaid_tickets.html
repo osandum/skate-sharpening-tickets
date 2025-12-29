@@ -48,6 +48,11 @@
                                     <div class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
                                         {{ t('status_unpaid') }}
                                     </div>
+                                    {% if ticket.price == 0 %}
+                                    <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
+                                        {{ t('free') }}
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="mt-2">
                                     <div class="text-sm font-medium text-gray-900">{{ ticket.customer_name }}</div>
@@ -66,6 +71,7 @@
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-2 ml-4">
+                                {% if ticket.price > 0 %}
                                 <a href="{{ url_for('customer.payment_page', ticket_code=ticket.code) }}"
                                    class="btn-primary text-center" target="_blank" rel="noopener">
                                     💳 {{ t('view_payment_page') }}
@@ -75,6 +81,17 @@
                                    onclick="return confirm('{{ t('confirm_claim_unpaid') }}')">
                                     ✅ {{ t('claim_as_paid') }}
                                 </a>
+                                {% else %}
+                                <a href="{{ url_for('customer.confirm_ticket', ticket_code=ticket.code) }}"
+                                   class="btn-primary text-center" target="_blank" rel="noopener">
+                                    ✅ {{ t('view_confirmation_page') }}
+                                </a>
+                                <a href="{{ url_for('sharpener.claim_ticket', ticket_id=ticket.id) }}"
+                                   class="btn-success text-center"
+                                   onclick="return confirm('{{ t('confirm_claim_unpaid') }}')">
+                                    ✅ {{ t('claim_as_confirmed') }}
+                                </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -82,6 +99,10 @@
             </div>
 
             <!-- Help Information -->
+            {% set has_paid = unpaid_tickets | selectattr('price', 'gt', 0) | list | length > 0 %}
+            {% set has_free = unpaid_tickets | selectattr('price', 'eq', 0) | list | length > 0 %}
+
+            {% if has_paid %}
             <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 class="font-semibold text-blue-900 mb-2">ℹ️ {{ t('about_unpaid_tickets') }}</h3>
                 <div class="text-sm text-blue-800 space-y-1">
@@ -90,6 +111,18 @@
                     <p>• {{ t('unpaid_help_3') }}</p>
                 </div>
             </div>
+            {% endif %}
+
+            {% if has_free %}
+            <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 class="font-semibold text-green-900 mb-2">ℹ️ {{ t('free') }} {{ t('about_unpaid_tickets') }}</h3>
+                <div class="text-sm text-green-800 space-y-1">
+                    <p>• {{ t('unconfirmed_help_1') }}</p>
+                    <p>• {{ t('unconfirmed_help_2') }}</p>
+                    <p>• {{ t('unconfirmed_help_3') }}</p>
+                </div>
+            </div>
+            {% endif %}
         {% else %}
             <!-- Empty State -->
             <div class="text-center py-12">

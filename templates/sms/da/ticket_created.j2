@@ -1,4 +1,8 @@
 Billetkode: {{ticket.code}}
 Skriv billetkode og dit navn på et stykke papir og læg det i skøjterne ved aflevering.
 
+{% if ticket.price > 0 %}
 Betal: {{payment_url}}
+{% else %}
+Bekræft indlevering: {{confirm_url}}
+{% endif %}

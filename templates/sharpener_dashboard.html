@@ -75,6 +75,9 @@
                                 <div class="text-sm text-gray-700">{{ ticket.customer_name }} • {{ ticket.customer_phone }}</div>
                                 <div class="text-sm text-gray-600">
                                     {{ t('skates') }}: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
+                                    {% if ticket.price == 0 %}
+                                    <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{{ t('free') }}</span>
+                                    {% endif %}
                                 </div>
                                 <div class="text-xs text-gray-500">
                                     Paid: {{ ticket.paid_at.strftime('%H:%M') if ticket.paid_at else 'Unknown' }}

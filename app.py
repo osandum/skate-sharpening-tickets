@@ -31,7 +31,11 @@ def create_app():
 
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///instance/skate_tickets.db')
+
+    # Use absolute path for SQLite database to avoid path resolution issues
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    default_db_path = f'sqlite:///{os.path.join(basedir, "instance", "skate_tickets.db")}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default_db_path)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Handle PostgreSQL URL format for SQLAlchemy 2.0+

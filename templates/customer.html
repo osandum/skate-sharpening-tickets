@@ -15,7 +15,11 @@
                 <li>{{ t('step_1_fill_details') }}</li>
                 <li>{{ t('step_2_get_sms') }}</li>
                 <li>{{ t('step_3_write_code') }}</li>
+                {% if sharpening_price > 0 %}
                 <li>{{ t('step_4_pay_sms') }}</li>
+                {% else %}
+                <li>{{ t('confirm_via_sms_step') }}</li>
+                {% endif %}
                 <li>{{ t('step_5_pickup_sms') }}</li>
             </ol>
         </div>
@@ -89,10 +93,17 @@
             </button>
         </form>
 
+        {% if sharpening_price > 0 %}
         <div class="mt-6 text-center text-sm text-gray-600">
             <p>💡 {{ t('payment_link_info') }}</p>
             <p>⚠️ {{ t('payment_required_info') }}</p>
         </div>
+        {% else %}
+        <div class="mt-6 text-center text-sm text-gray-600">
+            {# <p>💡 {{ t('free_sharpening_info') }}</p> #}
+            <p>✅ {{ t('confirmation_link_info') }}</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -189,9 +200,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // reCAPTCHA v3 integration
 document.getElementById('submit-btn').addEventListener('click', function(e) {
     e.preventDefault();
-    
+
     var form = document.querySelector('form');
-    
+
     // Check HTML5 form validity first
     if (!form.checkValidity()) {
         // Show validation messages by triggering native validation

@@ -12,6 +12,7 @@ class Ticket(db.Model):
     brand = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(20), nullable=False)
     size = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Integer, nullable=False)  # Price in DKK
 
     # Status tracking
     status = db.Column(db.String(20), default='unpaid')  # unpaid, paid, in_progress, completed

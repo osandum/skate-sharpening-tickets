@@ -28,8 +28,13 @@
                     <p class="text-3xl font-mono font-bold text-red-700">{{ ticket.code }}</p>
                     <p class="text-xs text-red-600 mt-2">{{ t('write_this_down') }}</p>
                 </div>
+                {% if price > 0 %}
                 <p class="text-sm font-semibold">{{ t('payment_link') }}:</p>
                 <a href="{{ payment_url }}" class="text-blue-600 hover:underline break-all text-sm">{{ payment_url }}</a>
+                {% else %}
+                <p class="text-sm font-semibold">{{ t('confirmation_link_info') }}:</p>
+                <a href="{{ confirm_url }}" class="text-blue-600 hover:underline break-all text-sm">{{ confirm_url }}</a>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -45,14 +50,24 @@
 
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-yellow-800 mb-2">📋 {{ t('next_steps') }}:</h3>
+            {% if price > 0 %}
             <ol class="text-sm text-yellow-700 space-y-2 list-decimal pl-6">
                 <li>{{ t('check_sms_step') }}</li>
                 <li>{{ t('write_code_step') }}</li>
                 <li>{{ t('pay_via_sms_step') }}</li>
                 <li>{{ t('pickup_notification_step') }}</li>
             </ol>
+            {% else %}
+            <ol class="text-sm text-yellow-700 space-y-2 list-decimal pl-6">
+                <li>{{ t('check_sms_step') }}</li>
+                <li>{{ t('write_code_step') }}</li>
+                <li>{{ t('confirm_via_sms_step') }}</li>
+                <li>{{ t('pickup_notification_step') }}</li>
+            </ol>
+            {% endif %}
         </div>
 
+        {% if price > 0 %}
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-gray-800 mb-2">ℹ️ {{ t('important_info') }}:</h3>
             <ul class="text-sm text-gray-700 space-y-1">
@@ -60,6 +75,15 @@
                 <li>• {{ t('payment_required_info') }}</li>
             </ul>
         </div>
+        {% else %}
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-2">ℹ️ {{ t('important_info') }}:</h3>
+            <ul class="text-sm text-gray-700 space-y-1">
+                {# <li>• {{ t('free_sharpening_info') }}</li> #}
+                <li>• {{ t('confirmation_required_info') }}</li>
+            </ul>
+        </div>
+        {% endif %}
 
         <div class="text-center">
             <a href="{{ url_for('customer.index') }}" class="btn-primary inline-block">

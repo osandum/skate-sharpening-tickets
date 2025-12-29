@@ -84,16 +84,25 @@ def request_ticket():
         customer_phone=phone,
         brand=brand,
         color=color,
-        size=size
+        size=size,
+        price=SHARPENING_PRICE_DKK  # Stamp current price
     )
 
     db.session.add(ticket)
     db.session.commit()
 
-    # Send SMS with payment link
-    payment_url = f"{BASE_URL}/pay/{ticket.code}"
+    # Send SMS based on ticket price
+    if ticket.price > 0:
+        # Paid mode: send payment link
+        payment_url = f"{BASE_URL}/pay/{ticket.code}"
+        sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
+        confirm_url = None
+    else:
+        # Free mode: send confirmation link
+        confirm_url = f"{BASE_URL}/confirm/{ticket.code}"
+        sms_message = render_sms_template('ticket_created', ticket=ticket, confirm_url=confirm_url)
+        payment_url = None
 
-    sms_message = render_sms_template('ticket_created', ticket=ticket, payment_url=payment_url)
     sms_success = send_sms(phone, sms_message)
 
     # Clear form data from session on success
@@ -109,6 +118,8 @@ def request_ticket():
         'skate_color': ticket.color,
         'skate_size': ticket.size,
         'payment_url': payment_url,
+        'confirm_url': confirm_url,
+        'price': ticket.price,
         'sms_success': sms_success
     }
 
@@ -119,6 +130,10 @@ def request_ticket():
 def payment_page(ticket_code):
     """Payment page for tickets"""
     ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
+
+    # Redirect free tickets to confirmation page
+    if ticket.price == 0:
+        return redirect(url_for('customer.confirm_ticket', ticket_code=ticket_code))
 
     if ticket.status != 'unpaid':
         return render_template('already_paid.html', ticket=ticket)
@@ -184,7 +199,9 @@ def ticket_created():
 
     return render_template('ticket_created.html',
                          ticket=ticket_info,
-                         payment_url=confirmation['payment_url'],
+                         payment_url=confirmation.get('payment_url'),
+                         confirm_url=confirmation.get('confirm_url'),
+                         price=confirmation.get('price'),
                          customer_name=confirmation['customer_name'],
                          phone_number=confirmation['phone_number'],
                          skate_brand=confirmation['skate_brand'],
@@ -321,6 +338,39 @@ def stripe_webhook():
             print("[Stripe Webhook] No ticket_code in payment metadata")
 
     return '', 200
+
+@customer_bp.route('/confirm/<ticket_code>')
+def confirm_ticket(ticket_code):
+    """Confirmation page for free tickets (no payment required)"""
+    ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
+
+    # Redirect paid tickets to payment page
+    if ticket.price > 0:
+        return redirect(url_for('customer.payment_page', ticket_code=ticket_code))
+
+    # Check if already confirmed
+    if ticket.status != 'unpaid':
+        return render_template('ticket_confirmed.html', ticket=ticket)
+
+    return render_template('confirm_free_ticket.html', ticket=ticket)
+
+@customer_bp.route('/confirm/<ticket_code>/process', methods=['POST'])
+def confirm_ticket_process(ticket_code):
+    """Process free ticket confirmation"""
+    ticket = Ticket.query.filter_by(code=ticket_code).first_or_404()
+
+    # Verify this is a free ticket
+    if ticket.price > 0:
+        flash(t('error_not_free_ticket'), 'error')
+        return redirect(url_for('customer.payment_page', ticket_code=ticket_code))
+
+    if ticket.status == 'unpaid':
+        # Mark as 'paid' (ready for sharpening)
+        ticket.status = 'paid'
+        ticket.paid_at = datetime.utcnow()
+        db.session.commit()
+
+    return render_template('ticket_confirmed.html', ticket=ticket)
 
 @customer_bp.route('/feedback/<ticket_code>', methods=['GET', 'POST'])
 def feedback(ticket_code):
