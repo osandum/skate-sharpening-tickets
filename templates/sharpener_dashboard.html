@@ -72,7 +72,7 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <div class="font-mono text-xl font-bold text-blue-800">{{ ticket.code }}</div>
-                                <div class="text-sm text-gray-700">{{ ticket.customer_name }} • {{ ticket.customer_phone }}</div>
+                                <div class="text-sm text-gray-700">{{ ticket.customer_name }} • {{ ticket.customer_phone | mask_phone }}</div>
                                 <div class="text-sm text-gray-600">
                                     {{ t('skates') }}: {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}
                                     {% if ticket.price == 0 %}

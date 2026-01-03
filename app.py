@@ -17,6 +17,7 @@ from itsdangerous import URLSafeTimedSerializer
 from models import db, Ticket, Sharpener, Feedback
 from utils.i18n import t
 from utils.banner import print_startup_banner
+from utils.helpers import mask_phone_number
 from routes import register_blueprints
 
 # Load environment variables from .env file
@@ -63,6 +64,9 @@ def create_app():
 
     # Register blueprints
     register_blueprints(app)
+
+    # Register Jinja2 filters
+    app.jinja_env.filters['mask_phone'] = mask_phone_number
 
     # Context processor for templates
     @app.context_processor
