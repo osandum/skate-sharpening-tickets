@@ -1,15 +1,24 @@
 import os
 import random
 
-# Configuration
-TICKET_CODE_LENGTH = int(os.environ.get('TICKET_CODE_LENGTH', '5'))
-TICKET_CODE_ALPHABET = os.environ.get('TICKET_CODE_ALPHABET', 'CEFHJKMNPQRTUVWXY379')
+# Configuration for LL-NNN format ticket codes
+# Unambiguous letters: excludes I, Z, A, S, B, O, Q, D, G, L
+TICKET_LETTERS = 'CEFHJKMNPRTUVWXY'
+# Unambiguous digits: excludes 0, 1, 2, 4, 5, 8
+TICKET_DIGITS = '3679'
 
 def generate_ticket_code():
-    """Generate a ticket code using configurable length and alphabet"""
-    # Use configurable alphabet and length (defaults: unambiguous chars, 5 chars)
-    # Default excludes confusing characters: 0/O, 1/I/L, D (looks like 0)
-    return ''.join(random.choices(TICKET_CODE_ALPHABET, k=TICKET_CODE_LENGTH))
+    """
+    Generate a ticket code in format LL-NNN.
+    Two unique uppercase letters + hyphen + three unique digits.
+    Uses reduced character sets to prevent ambiguities in handwriting.
+    """
+    # Generate 2 unique letters
+    letters = random.sample(TICKET_LETTERS, 2)
+    # Generate 3 unique digits
+    digits = random.sample(TICKET_DIGITS, 3)
+
+    return f"{''.join(letters)}-{''.join(digits)}"
 
 def normalize_phone_number(phone):
     """Normalize Danish phone number to international format"""
