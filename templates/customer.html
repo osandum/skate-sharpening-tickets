@@ -91,9 +91,11 @@
                 </div>
             </div>
 
-            <button type="submit" class="w-full btn-primary text-lg" id="submit-btn">
-                📱 {{ t('submit_button') }}
-            </button>
+            <div class="mt-8">
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" id="submit-btn">
+                    {{ t('submit_button') }}
+                </button>
+            </div>
         </form>
 
         {% if sharpening_price > 0 %}

@@ -189,6 +189,10 @@ def ticket_created():
         flash(t('session_expired'), 'error')
         return redirect(url_for('customer.index'))
 
+    # Show SMS confirmation as flash message
+    if confirmation['sms_success']:
+        flash(f"{t('sms_sent_to')}: {confirmation['phone_number']}", 'success')
+
     # Prepare ticket info for template
     ticket_info = {
         'code': confirmation['code'],
