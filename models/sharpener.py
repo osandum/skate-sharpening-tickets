@@ -10,7 +10,9 @@ class Sharpener(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship
-    tickets = db.relationship('Ticket', backref='sharpener', lazy=True)
+    # Relationship - explicitly specify foreign_key since Ticket has multiple FKs to Sharpener
+    tickets = db.relationship('Ticket', backref='sharpener', lazy=True,
+                              foreign_keys='Ticket.sharpened_by_id')

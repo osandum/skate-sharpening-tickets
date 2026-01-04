@@ -83,9 +83,18 @@
                                     Paid: {{ ticket.paid_at.strftime('%H:%M') if ticket.paid_at else 'Unknown' }}
                                 </div>
                             </div>
-                            <a href="{{ url_for('sharpener.claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
-                                {{ t('claim_ticket') }}
-                            </a>
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('sharpener.claim_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                    {{ t('claim_ticket') }}
+                                </a>
+                                {% if session.sharpener_is_admin %}
+                                <a href="{{ url_for('sharpener.cancel_ticket', ticket_id=ticket.id) }}"
+                                   class="btn-danger"
+                                   onclick="return confirm('{{ t('confirm_cancel_ticket') }}')">
+                                    ❌
+                                </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -123,6 +132,13 @@
                                     <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
                                         {{ t('complete_ticket') }}
                                     </a>
+                                    {% if session.sharpener_is_admin %}
+                                    <a href="{{ url_for('sharpener.cancel_ticket', ticket_id=ticket.id) }}"
+                                       class="btn-danger"
+                                       onclick="return confirm('{{ t('confirm_cancel_ticket') }}')">
+                                        ❌
+                                    </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

@@ -15,7 +15,7 @@ class Ticket(db.Model):
     price = db.Column(db.Integer, nullable=False)  # Price in DKK
 
     # Status tracking
-    status = db.Column(db.String(20), default='unpaid')  # unpaid, paid, in_progress, completed
+    status = db.Column(db.String(20), default='unpaid')  # unpaid, paid, in_progress, completed, cancelled
     payment_id = db.Column(db.String(100))  # Stripe payment intent ID
 
     # Timestamps
@@ -23,9 +23,11 @@ class Ticket(db.Model):
     paid_at = db.Column(db.DateTime)
     started_at = db.Column(db.DateTime)
     completed_at = db.Column(db.DateTime)
+    cancelled_at = db.Column(db.DateTime)
 
     # Sharpener tracking
     sharpened_by_id = db.Column(db.Integer, db.ForeignKey('sharpener.id'))
+    cancelled_by_id = db.Column(db.Integer, db.ForeignKey('sharpener.id'))
 
     # Relationships
     feedback = db.relationship('Feedback', backref='ticket', uselist=False)

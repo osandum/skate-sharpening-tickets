@@ -103,9 +103,18 @@ complete_ticket: "Complete"
 # Flash messages
 ticket_not_available: "Ticket is not available"
 ticket_claimed: "Ticket {0} has been claimed"
+unpaid_ticket_claimed: "Unpaid ticket {0} has been moved to paid status"
 ticket_unclaimed: "Ticket {0} has been unclaimed"
 ticket_completed: "Ticket {0} has been completed"
+ticket_cancelled: "Ticket {0} has been cancelled"
 cannot_unclaim: "Cannot unclaim this ticket"
+cannot_cancel_completed: "Cannot cancel a completed ticket"
+ticket_already_cancelled: "Ticket is already cancelled"
+
+# Cancel feature
+cancel_ticket: "Cancel"
+confirm_cancel_ticket: "Are you sure you want to cancel this ticket? This action cannot be undone."
+status_cancelled: "Cancelled"
 
 ticket_details: "Ticket Details"
 ticket_code: "Ticket Code"

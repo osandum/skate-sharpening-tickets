@@ -92,6 +92,13 @@
                                     ✅ {{ t('claim_as_confirmed') }}
                                 </a>
                                 {% endif %}
+                                {% if session.sharpener_is_admin %}
+                                <a href="{{ url_for('sharpener.cancel_ticket', ticket_id=ticket.id) }}"
+                                   class="btn-danger text-center"
+                                   onclick="return confirm('{{ t('confirm_cancel_ticket') }}')">
+                                    ❌ {{ t('cancel_ticket') }}
+                                </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

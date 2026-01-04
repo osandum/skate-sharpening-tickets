@@ -97,16 +97,25 @@ status_paid: "Betalt"
 status_in_progress: "I gang"
 status_completed: "Færdig"
 
-claim_ticket: "Claim"
+claim_ticket: "Påtag"
 unclaim_ticket: "Afmeld"
 complete_ticket: "Færdiggør"
 
 # Flash messages
 ticket_not_available: "Billet er ikke tilgængelig"
-ticket_claimed: "Billet {0} er blevet claimed"
+ticket_claimed: "Billet {0} er blevet påtaget"
+unpaid_ticket_claimed: "Ubetalt billet {0} er blevet markeret som betalt"
 ticket_unclaimed: "Billet {0} er blevet afmeldt"
 ticket_completed: "Billet {0} er blevet færdiggjort"
+ticket_cancelled: "Billet {0} er blevet annulleret"
 cannot_unclaim: "Kan ikke afmelde denne billet"
+cannot_cancel_completed: "Kan ikke annullere en færdiggjort billet"
+ticket_already_cancelled: "Billet er allerede annulleret"
+
+# Cancel feature
+cancel_ticket: "Annullér"
+confirm_cancel_ticket: "Er du sikker på at du vil annullere denne billet? Denne handling kan ikke fortrydes."
+status_cancelled: "Annulleret"
 
 ticket_details: "Billetdetaljer"
 ticket_code: "Billetkode"
@@ -116,7 +125,7 @@ brand: "Mærke"
 color: "Farve"
 size: "Størrelse"
 created_at: "Oprettet"
-claimed_at: "Claimed"
+claimed_at: "Påtaget"
 completed_at: "Færdiggjort"
 
 no_tickets: "Ingen billetter"

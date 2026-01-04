@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
 from models import db, Ticket, Sharpener, Feedback
-from services import send_sms, render_sms_template, login_required
+from services import send_sms, render_sms_template, login_required, admin_required
 from utils import t
 
 sharpener_bp = Blueprint('sharpener', __name__, url_prefix='/sharpener')
@@ -19,6 +19,7 @@ def login():
         if sharpener and check_password_hash(sharpener.password_hash, password):
             session['sharpener_id'] = sharpener.id
             session['sharpener_name'] = sharpener.name
+            session['sharpener_is_admin'] = sharpener.is_admin or False
             return redirect(url_for('sharpener.dashboard'))
         else:
             flash(t('invalid_login'))
@@ -148,3 +149,25 @@ def complete_ticket(ticket_id):
 
     flash(t('ticket_completed', ticket.code))
     return redirect(url_for('sharpener.dashboard'))
+
+@sharpener_bp.route('/cancel/<int:ticket_id>')
+@admin_required
+def cancel_ticket(ticket_id):
+    """Cancel a ticket (admin only)"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+
+    if ticket.status == 'completed':
+        flash(t('cannot_cancel_completed'))
+        return redirect(request.referrer or url_for('sharpener.dashboard'))
+
+    if ticket.status == 'cancelled':
+        flash(t('ticket_already_cancelled'))
+        return redirect(request.referrer or url_for('sharpener.dashboard'))
+
+    ticket.status = 'cancelled'
+    ticket.cancelled_at = datetime.utcnow()
+    ticket.cancelled_by_id = session['sharpener_id']
+    db.session.commit()
+
+    flash(t('ticket_cancelled', ticket.code))
+    return redirect(request.referrer or url_for('sharpener.dashboard'))
