@@ -5,6 +5,7 @@ from email.utils import formataddr
 from flask import current_app
 from flask_mail import Message, Mail
 from models import Sharpener
+from utils.helpers import mask_phone_number
 
 
 def notify_sharpeners_new_ticket(ticket):
@@ -60,7 +61,7 @@ A new ticket is ready for sharpening:
 
 Ticket Code: {ticket.code}
 Customer: {ticket.customer_name}
-Phone: {ticket.customer_phone}
+Phone: {mask_phone_number(ticket.customer_phone)}
 Skates: {ticket.brand} {ticket.color} size {ticket.size}
 {'Price: ' + str(ticket.price) + ' DKK' if ticket.price > 0 else 'Confirmation completed'}
 
@@ -84,7 +85,7 @@ SKK Skate Sharpening System
     <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
         <p style="margin: 5px 0;"><strong>Ticket Code:</strong> {ticket.code}</p>
         <p style="margin: 5px 0;"><strong>Customer:</strong> {ticket.customer_name}</p>
-        <p style="margin: 5px 0;"><strong>Phone:</strong> {ticket.customer_phone}</p>
+        <p style="margin: 5px 0;"><strong>Phone:</strong> {mask_phone_number(ticket.customer_phone)}</p>
         <p style="margin: 5px 0;"><strong>Skates:</strong> {ticket.brand} {ticket.color} size {ticket.size}</p>
         {'<p style="margin: 5px 0;"><strong>Price:</strong> ' + str(ticket.price) + ' DKK</p>' if ticket.price > 0 else '<p style="margin: 5px 0;">Confirmation completed</p>'}
     </div>
