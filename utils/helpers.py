@@ -1,5 +1,6 @@
 import os
 import random
+from datetime import datetime, timedelta
 
 # Configuration for LL-NNN format ticket codes
 # Unambiguous letters: excludes I, Z, A, S, B, O, Q, D, G, L
@@ -58,3 +59,21 @@ def mask_phone_number(phone):
     end = n - 2
 
     return digits[:start] + 'x' * digits_to_mask + digits[end:]
+
+
+def format_datetime(dt, fallback='Unknown'):
+    """
+    Format datetime consistently across the application.
+    - Within last 6 months: "d/m HH:MM" (e.g., "4/1 21:30")
+    - Older than 6 months: "YYYY-m-d" (e.g., "2025-7-15")
+    """
+    if not dt:
+        return fallback
+
+    now = datetime.utcnow()
+    six_months_ago = now - timedelta(days=180)
+
+    if dt >= six_months_ago:
+        return dt.strftime('%-d/%-m %H:%M')
+    else:
+        return dt.strftime('%Y-%-m-%-d')

@@ -62,12 +62,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500">
-                                    {{ t('created') }}: {{ ticket.created_at.strftime('%d/%m/%Y %H:%M') }}
-                                    {% if ticket.created_at %}
-                                        <span class="ml-2">
-                                            ({{ ((now - ticket.created_at).total_seconds() / 60) | int }} {{ t('minutes_ago') }})
-                                        </span>
-                                    {% endif %}
+                                    {{ t('created_at') }}: {{ ticket.created_at | fmt_dt }}
                                 </div>
                             </div>
                             <div class="flex flex-col space-y-2 ml-4">

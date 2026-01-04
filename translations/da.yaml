@@ -126,6 +126,7 @@ color: "Farve"
 size: "Størrelse"
 created_at: "Oprettet"
 claimed_at: "Påtaget"
+started_at: "Startet"
 completed_at: "Færdiggjort"
 
 no_tickets: "Ingen billetter"

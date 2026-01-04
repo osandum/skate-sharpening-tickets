@@ -125,6 +125,7 @@ color: "Color"
 size: "Size"
 created_at: "Created"
 claimed_at: "Claimed"
+started_at: "Started"
 completed_at: "Completed"
 
 no_tickets: "No tickets"
