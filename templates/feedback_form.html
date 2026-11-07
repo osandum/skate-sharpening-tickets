@@ -24,11 +24,12 @@
                 <label class="block text-sm font-medium text-gray-700 mb-4 text-center">
                     {{ t('rate_service') }} *
                 </label>
-                <div class="flex justify-center space-x-2">
+                <div class="flex justify-center">
                     {% for i in range(1, 6) %}
                         <label class="cursor-pointer">
-                            <input type="radio" name="rating" value="{{ i }}" required class="sr-only">
-                            <span class="star text-3xl text-gray-300 hover:text-yellow-400 transition-colors" data-rating="{{ i }}">⭐</span>
+                            <input type="radio" name="rating" value="{{ i }}" required class="sr-only" aria-label="{{ t('rating_' ~ i) }}">
+                            {# ★ is a text glyph, so CSS color applies; the ⭐ emoji ignores it #}
+                            <span class="star inline-block px-1 text-5xl leading-none text-gray-300 transition-colors" aria-hidden="true">★</span>
                         </label>
                     {% endfor %}
                 </div>
@@ -53,48 +54,44 @@
     </div>
 </div>
 
+<style>
+input[name="rating"]:focus-visible + .star {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+</style>
+
 <script>
 const stars = document.querySelectorAll('.star');
+const radios = document.querySelectorAll('input[name="rating"]');
 const ratingText = document.getElementById('rating-text');
-const ratings = ['', 'Dårlig 😞', 'OK 😐', 'God 🙂', 'Rigtig god 😊', 'Fremragende! 🤩'];
+const ratings = [
+    {{ t('click_to_rate') | tojson }},
+    {% for i in range(1, 6) %}{{ t('rating_' ~ i) | tojson }}{% if not loop.last %}, {% endif %}{% endfor %}
+];
 
-stars.forEach((star, index) => {
-    star.addEventListener('click', () => {
-        const rating = index + 1;
-
-        // Update radio button
-        document.querySelector(`input[value="${rating}"]`).checked = true;
-
-        // Update visual stars
-        stars.forEach((s, i) => {
-            s.style.color = i < rating ? '#fbbf24' : '#d1d5db';
-        });
-
-        // Update text
-        ratingText.textContent = ratings[rating];
+function showRating(rating) {
+    stars.forEach((s, i) => {
+        s.style.color = i < rating ? '#fbbf24' : '#d1d5db';
     });
+    ratingText.textContent = ratings[rating];
+}
 
-    star.addEventListener('mouseover', () => {
-        const rating = index + 1;
-        stars.forEach((s, i) => {
-            s.style.color = i < rating ? '#fbbf24' : '#d1d5db';
-        });
-        ratingText.textContent = ratings[rating];
-    });
+function selectedRating() {
+    const checked = document.querySelector('input[name="rating"]:checked');
+    return checked ? parseInt(checked.value) : 0;
+}
+
+// Tap, click and keyboard all go through the radio's change event
+radios.forEach(radio => {
+    radio.addEventListener('change', () => showRating(selectedRating()));
 });
 
-document.querySelector('form').addEventListener('mouseleave', () => {
-    const checked = document.querySelector('input[name="rating"]:checked');
-    if (checked) {
-        const rating = parseInt(checked.value);
-        stars.forEach((s, i) => {
-            s.style.color = i < rating ? '#fbbf24' : '#d1d5db';
-        });
-        ratingText.textContent = ratings[rating];
-    } else {
-        stars.forEach(s => s.style.color = '#d1d5db');
-        ratingText.textContent = 'Klik for at bedømme';
-    }
+// Hover preview on devices with a pointer
+stars.forEach((star, index) => {
+    star.addEventListener('mouseover', () => showRating(index + 1));
+    star.addEventListener('mouseleave', () => showRating(selectedRating()));
 });
 </script>
 {% endblock %}

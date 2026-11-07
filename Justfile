@@ -42,6 +42,6 @@ install:
 
 # Show current environment variables for debugging
 show-env:
-    @echo "GATEWAYAPI_TOKEN: ${GATEWAYAPI_TOKEN:-(unset)}"
+    @echo "GATEWAYAPI_TOKEN: $([ -n "${GATEWAYAPI_TOKEN:-}" ] && echo '(set, masked)' || echo '(unset)')"
     @echo "BASE_URL: ${BASE_URL:-(unset)}"
     @echo "SECRET_KEY: $([ -n "${SECRET_KEY:-}" ] && echo '(set, masked)' || echo '(unset)')"

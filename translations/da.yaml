@@ -256,3 +256,28 @@ pickup_sms_notification: "Du får SMS når de er klar til afhentning"
 error_not_free_ticket: "Denne billet kræver betaling"
 price: "Pris"
 free: "Gratis"
+
+# Betalingsstatus (allerede betalt)
+already_paid: "Allerede betalt"
+sharpening_will_begin_soon: "Dine skøjter er i køen og bliver slebet snart"
+
+# Feedback-sider
+rating_1: "Dårlig 😞"
+rating_2: "OK 😐"
+rating_3: "God 🙂"
+rating_4: "Rigtig god 😊"
+rating_5: "Fremragende! 🤩"
+feedback_thanks_title: "Tak for din feedback!"
+feedback_thanks_message: "Den hjælper vores frivillige slibere med at blive bedre."
+feedback_already_given_title: "Feedback allerede modtaget"
+feedback_already_given_message: "Du har allerede bedømt denne slibning. Tak!"
+feedback_not_available: "Feedback er ikke tilgængelig endnu"
+feedback_only_completed: "Du kan give feedback, når dine skøjter er slebet."
+your_ticket: "Din billet"
+your_rating: "Din bedømmelse"
+your_comment: "Din kommentar"
+new_ticket: "Få slebet et par mere"
+
+# Sliber-handlinger
+confirm_complete_ticket: "Færdiggør billet {0}? Kunden får en SMS om, at skøjterne er klar til afhentning."
+invite_sharpener: "Invitér sliber"

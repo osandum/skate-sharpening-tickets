@@ -129,7 +129,8 @@
                                     <a href="{{ url_for('sharpener.unclaim_ticket', ticket_id=ticket.id) }}" class="btn-secondary">
                                         {{ t('unclaim_ticket') }}
                                     </a>
-                                    <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success">
+                                    <a href="{{ url_for('sharpener.complete_ticket', ticket_id=ticket.id) }}" class="btn-success"
+                                       onclick="return confirm('{{ t('confirm_complete_ticket', ticket.code) }}')">
                                         {{ t('complete_ticket') }}
                                     </a>
                                     {% if session.sharpener_is_admin %}

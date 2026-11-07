@@ -7,26 +7,49 @@
     <title>{% block title %}{{ t('skate_sharpening') }}{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        .btn-primary { @apply bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors; }
-        .btn-success { @apply bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors; }
-        .btn-danger { @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors; }
+        /* Plain CSS: @apply only works with a Tailwind build step, not with the prebuilt CDN stylesheet */
+        .btn-primary, .btn-success, .btn-danger, .btn-secondary {
+            font-weight: 600;
+            line-height: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            transition: background-color 150ms ease-out;
+        }
+        .btn-primary { background-color: #3b82f6; color: #fff; padding: 0.75rem 1.5rem; }
+        .btn-primary:hover { background-color: #2563eb; }
+        .btn-success, .btn-danger, .btn-secondary { padding: 0.625rem 1rem; }
+        .btn-success { background-color: #10b981; color: #fff; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: #ef4444; color: #fff; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-secondary { background-color: #e5e7eb; color: #1f2937; }
+        .btn-secondary:hover { background-color: #d1d5db; }
+
+        /* Colors missing from the Tailwind 2 default palette */
+        .bg-cyan-200 { background-color: #a5f3fc; }
+        .bg-orange-50 { background-color: #fff7ed; }
+        .border-orange-200 { border-color: #fed7aa; }
+        .text-orange-600 { color: #ea580c; }
+        .text-orange-700 { color: #c2410c; }
+        .text-orange-800 { color: #9a3412; }
 
         /* Remove card borders on small screens */
         @media (max-width: 640px) {
-            .card-wrapper {
-                @apply rounded-none shadow-none p-4 bg-transparent;
-            }
-            .card-wrapper-compact {
-                @apply rounded-none shadow-none p-4 bg-transparent;
+            .card-wrapper, .card-wrapper-compact {
+                border-radius: 0;
+                box-shadow: none;
+                padding: 1rem;
+                background-color: transparent;
             }
         }
         @media (min-width: 641px) {
-            .card-wrapper {
-                @apply rounded-lg shadow-lg p-8 bg-white;
+            .card-wrapper, .card-wrapper-compact {
+                border-radius: 0.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                background-color: #fff;
             }
-            .card-wrapper-compact {
-                @apply rounded-lg shadow-lg p-6 bg-white;
-            }
+            .card-wrapper { padding: 2rem; }
+            .card-wrapper-compact { padding: 1.5rem; }
         }
     </style>
     <!-- Google reCAPTCHA v3 -->
