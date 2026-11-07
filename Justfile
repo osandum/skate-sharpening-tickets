@@ -2,6 +2,8 @@
 image_name := "skate-sharpening"
 registry := "sandum.net:5000/osa"
 
+set dotenv-load
+
 @_default:
     @just --list --unsorted
 
@@ -40,6 +42,6 @@ install:
 
 # Show current environment variables for debugging
 show-env:
-    @echo "GATEWAYAPI_TOKEN: ${GATEWAYAPI_TOKEN}"
-    @echo "BASE_URL: ${BASE_URL}"
-    @echo "SECRET_KEY: ${SECRET_KEY}"
+    @echo "GATEWAYAPI_TOKEN: ${GATEWAYAPI_TOKEN:-(unset)}"
+    @echo "BASE_URL: ${BASE_URL:-(unset)}"
+    @echo "SECRET_KEY: $([ -n "${SECRET_KEY:-}" ] && echo '(set, masked)' || echo '(unset)')"
