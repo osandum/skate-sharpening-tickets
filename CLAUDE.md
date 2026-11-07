@@ -7,8 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Flask application for managing ice skate sharpening tickets with SMS notifications, payment integration, and internationalization support.
 
 ### Virtual Environment
-- Project uses Python virtual environment in `venv/` directory
-- Activate with: `source venv/bin/activate`
+- Python version (3.11, matching the Docker image) and the `venv/` virtual environment are managed by mise via `mise.toml`
+- First time: `mise trust`, then `cd` into the project – mise installs Python, creates `venv/` and activates it
+- Install dependencies with `just install`
 - Dependencies in `requirements.txt`: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Mail, Werkzeug, requests, stripe, psycopg2-binary, PyYAML, python-dotenv, gunicorn
 
 ### Running the Application
