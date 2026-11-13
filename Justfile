@@ -1,6 +1,9 @@
 # justfile
 image_name := "skate-sharpening"
 registry := "sandum.net:5000/osa"
+prod_registry := "registry.home.arpa:5000/osa"
+prod_host := "rocky@apps"
+prod_dir := "~/skate-sharpening"
 
 set dotenv-load
 
@@ -27,6 +30,13 @@ release version='latest':
 refresh-staging version='latest':
     docker push {{registry}}/{{image_name}}:{{version}}
     ssh abode docker compose -f ~/sms-ticket/compose.yml up -d --pull=always
+
+# Build, push :latest, back up the DB and deploy to production (apps)
+release-prod:
+    @just build
+    docker tag {{image_name}}:latest {{prod_registry}}/{{image_name}}:latest
+    docker push {{prod_registry}}/{{image_name}}:latest
+    ssh {{prod_host}} 'cd {{prod_dir}} && cp -a data data.bak-$(date +%Y%m%d-%H%M%S) && docker compose pull skate-sharpening && docker compose up -d skate-sharpening'
 
 # Test SMS functionality
 test-sms:
