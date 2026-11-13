@@ -132,6 +132,9 @@ Required for production (simulation mode for development):
 - Sends ticket creation, payment confirmation, and pickup notifications
 - Danish mobile number normalization (utils/helpers.py)
 - Simulation mode in development (prints to console)
+- HTTP 200 from GatewayAPI only means *accepted*; delivery is reported asynchronously. Each SMS carries `userref=<ticket code>` and a `callback_url` to `/sms/status/<token>` (`routes/webhooks.py`, token derived from `SECRET_KEY`), which logs the status and stores it in `Ticket.sms_status` / `sms_error`. Failed deliveries are flagged on the sharpener pages
+- GatewayAPI rejects messages containing links to non-approved domains (error `0x1903`). Only `sms-ti.cket.dk` is approved, so `BASE_URL` must use that host
+- Keep SMS templates within one GSM-7 segment (≤ 160 chars incl. link) – `ticket_created` is ~155 chars
 
 ### Payment Processing (Stripe + MobilePay)
 - Implementation: `services/payment.py: create_stripe_payment_intent()`
@@ -191,3 +194,12 @@ All variables from "Development Environment Setup" section apply. Key production
 - Automatic database migrations on container start (`flask db upgrade`)
 - Startup banner displays build time and git commit hash
 - OpenContainer labels for metadata
+
+## Production
+
+- Public URL `https://sms-ti.cket.dk` (also `skk.sms-ti.cket.dk`), proxied by Caddy (`rocky@apps:~/caddy/Caddyfile`) to `skate-sharpening:5000`
+- Runs on host `apps` as user `rocky`, compose project in `~/skate-sharpening/` (`compose.yml`, `data/` with the SQLite DB, Mailpit as SMTP). This compose file and its env vars (incl. `BASE_URL=https://sms-ti.cket.dk`) live only on the server, not in this repo
+- Image: `registry.home.arpa:5000/osa/skate-sharpening:latest`
+- Deploy with `just release-prod`: builds, pushes `:latest`, backs up `data/` to `data.bak-<timestamp>` and recreates the container (migrations run on start). Old backups are not pruned
+- Logs: `ssh rocky@apps docker logs skate-sharpening-skate-sharpening-1` – grep for `[SMS]` to trace sends and delivery statuses
+- `just release` / `refresh-staging` target the staging host `abode` (`sandum.net:5000` registry), not production
