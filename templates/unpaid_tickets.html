@@ -53,6 +53,11 @@
                                         {{ t('free') }}
                                     </div>
                                     {% endif %}
+                                    {% if ticket.sms_failed %}
+                                    <div class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold" title="{{ ticket.sms_error or ticket.sms_status }}">
+                                        ⚠️ {{ t('sms_not_delivered') }}
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="mt-2">
                                     <div class="text-sm font-medium text-gray-900">{{ ticket.customer_name }}</div>

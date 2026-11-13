@@ -104,7 +104,7 @@ def request_ticket():
         sms_message = render_sms_template('ticket_created', ticket=ticket, confirm_url=confirm_url)
         payment_url = None
 
-    sms_success = send_sms(phone, sms_message)
+    sms_success = send_sms(phone, sms_message, ref=ticket.code)
 
     # Clear form data from session on success
     if 'ticket_form_data' in session:
@@ -237,7 +237,7 @@ def payment_process(ticket_code):
                 'payment_confirmed',
                 ticket=ticket
             )
-            send_sms(ticket.customer_phone, sms_message)
+            send_sms(ticket.customer_phone, sms_message, ref=ticket.code)
 
     # Redirect to return page after processing
     return redirect(url_for('customer.payment_return', ticket_code=ticket_code))
@@ -342,7 +342,7 @@ def stripe_webhook():
                         'payment_confirmed',
                         ticket=ticket
                     )
-                    send_sms(ticket.customer_phone, sms_message)
+                    send_sms(ticket.customer_phone, sms_message, ref=ticket.code)
             else:
                 print(f"[Stripe Webhook] Ticket {ticket_code} not found or already paid")
         else:

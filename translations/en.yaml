@@ -179,6 +179,7 @@ return_home: "Return home"
 # Ticket creation confirmation
 ticket_created_title: "Ticket Created!"
 sms_sent_message: "SMS sent successfully!"
+sms_not_delivered: "SMS not delivered"
 sms_sent_to: "SMS sent to"
 sms_send_failed: "SMS could not be sent"
 sms_failed_explanation: "There was an error sending the SMS. Please write down your ticket code and use the payment link below."

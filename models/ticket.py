@@ -1,6 +1,9 @@
 from datetime import datetime
 from .database import db
 
+# GatewayAPI statuses meaning the message will never reach the recipient
+SMS_FAILED_STATUSES = {'REJECTED', 'UNDELIVERABLE', 'EXPIRED', 'DELETED', 'SKIPPED'}
+
 class Ticket(db.Model):
     """Database model for customer skate sharpening tickets."""
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +20,14 @@ class Ticket(db.Model):
     # Status tracking
     status = db.Column(db.String(20), default='unpaid')  # unpaid, paid, in_progress, completed, cancelled
     payment_id = db.Column(db.String(100))  # Stripe payment intent ID
+
+    # Delivery status of the latest SMS, reported by the GatewayAPI status callback
+    sms_status = db.Column(db.String(20))
+    sms_error = db.Column(db.String(255))
+
+    @property
+    def sms_failed(self):
+        return self.sms_status in SMS_FAILED_STATUSES
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

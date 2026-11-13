@@ -185,6 +185,7 @@ return_home: "Tilbage til forsiden"
 # Ticket creation confirmation
 ticket_created_title: "Billet oprettet!"
 sms_sent_message: "SMS sendt!"
+sms_not_delivered: "SMS ikke leveret"
 sms_sent_to: "SMS sendt til"
 sms_send_failed: "SMS kunne ikke sendes"
 sms_failed_explanation: "Der opstod en fejl ved afsendelse af SMS. Skriv billetkoden ned, og brug betalingslinket nedenfor."

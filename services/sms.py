@@ -1,6 +1,8 @@
+import hashlib
+import hmac
 import os
 import requests
-from flask import render_template
+from flask import current_app, render_template
 from utils.helpers import normalize_phone_number
 from utils.i18n import get_language
 
@@ -43,8 +45,17 @@ def detect_optimal_encoding(message):
 
     return "GSM0338"
 
-def send_sms(phone, message):
-    """Send SMS using GatewayAPI with automatic encoding detection"""
+def callback_token():
+    """Secret path token for the GatewayAPI delivery status webhook, derived from SECRET_KEY"""
+    key = current_app.config['SECRET_KEY'].encode()
+    return hmac.new(key, b'gatewayapi-status-callback', hashlib.sha256).hexdigest()[:32]
+
+def send_sms(phone, message, ref=None):
+    """Send SMS using GatewayAPI with automatic encoding detection.
+
+    ref (typically the ticket code) is passed as userref, and a status callback is
+    requested, so delivery failures can be traced back to the ticket.
+    """
     if not GATEWAYAPI_TOKEN or GATEWAYAPI_TOKEN == 'your-gatewayapi-token':
         # Simulation mode for development
         encoding = detect_optimal_encoding(message)
@@ -67,6 +78,11 @@ def send_sms(phone, message):
         "recipients": [{"msisdn": msisdn}]  # Recipient list
     }
 
+    if ref:
+        base_url = current_app.config['BASE_URL'].rstrip('/')
+        data["userref"] = ref
+        data["callback_url"] = f"{base_url}/sms/status/{callback_token()}"
+
     # Only set encoding if UCS2 is needed (GSM-7 is default)
     if encoding == "UCS2":
         data["encoding"] = "UCS2"
@@ -83,7 +99,9 @@ def send_sms(phone, message):
         )
 
         if response.status_code == 200:
-            print(f"[SMS] Successfully sent to {msisdn}")
+            # Accepted for delivery only – actual delivery is reported via the status callback
+            ids = response.json().get('ids', [])
+            print(f"[SMS] Accepted by GatewayAPI for {msisdn} (ref: {ref}, ids: {ids})")
             return True
         else:
             print(f"[SMS] Failed to send. Status: {response.status_code}")

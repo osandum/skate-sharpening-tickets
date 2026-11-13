@@ -158,7 +158,12 @@
                     <div class="bg-gray-50 border rounded-lg p-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <div class="font-mono text-lg font-bold">{{ ticket.code }}</div>
+                                <div class="font-mono text-lg font-bold">
+                                    {{ ticket.code }}
+                                    {% if ticket.sms_failed %}
+                                    <span class="ml-2 text-xs font-sans font-semibold bg-red-100 text-red-800 px-2 py-1 rounded" title="{{ ticket.sms_error or ticket.sms_status }}">⚠️ {{ t('sms_not_delivered') }}</span>
+                                    {% endif %}
+                                </div>
                                 <div class="text-sm text-gray-600">{{ ticket.customer_name }} • {{ ticket.brand }} {{ ticket.color }} {{ ticket.size }}</div>
                                 <div class="text-xs text-gray-500">{{ t('completed_at') }}: {{ ticket.completed_at | fmt_dt }}</div>
                             </div>

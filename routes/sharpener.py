@@ -145,7 +145,7 @@ def complete_ticket(ticket_id):
         ticket=ticket,
         feedback_url=feedback_url
     )
-    send_sms(ticket.customer_phone, sms_message)
+    send_sms(ticket.customer_phone, sms_message, ref=ticket.code)
 
     flash(t('ticket_completed', ticket.code))
     return redirect(url_for('sharpener.dashboard'))
